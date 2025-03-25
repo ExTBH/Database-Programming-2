@@ -1,2 +1,72 @@
-<h1>Welcome to Our Store</h1>
-<p>Browse our amazing products.</p>
+<div class="container my-5">
+    <div class="position-relative">
+        <img class="img-fluid rounded" style="filter: brightness(0.7);" src="/images/home-hero.jpg" alt="Hero Image">
+
+        <div class="position-absolute bottom-0 start-0 p-4 text-white">
+            <h1 class="display-4 fw-bold text-shadow">Rent from BAHRENT</h1>
+            <p class="fs-5 mb-4 text-shadow">Find the perfect gear for your next project</p>
+
+            <a href="/login.php" class="btn btn-success btn-lg fw-bold">Rent Equipment</a>
+        </div>
+    </div>
+
+    <h1 class="mt-5 mb-4 fw-bold text-center">Why Rent from us?</h1>
+
+    <!-- Features cards -->
+    <div class="row g-3">
+        <?php foreach ($featuresList as $feature): ?>
+            <div class="col-md-4">
+                <div class="card border-success bg-light h-100">
+                    <div class="card-body text-center">
+                        <div class="text-success mb-3">
+                            <i class="fa-solid <?= htmlspecialchars($feature->icon) ?> fa-2x"></i>
+                        </div>
+                        <h5 class="card-title fw-bold"><?= htmlspecialchars($feature->title) ?></h5>
+                        <p class="card-text text-muted"><?= htmlspecialchars($feature->description) ?></p>
+                    </div>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+
+    <!-- FAQ Section -->
+    <h1 class="mt-5 mb-4 fw-bold text-center">Frequently Asked Questions</h1>
+    <div class="accordion" id="faqAccordion">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="faqHeading1">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse1" aria-expanded="true" aria-controls="faqCollapse1">
+                    How does the rental process work?
+                </button>
+            </h2>
+            <div id="faqCollapse1" class="accordion-collapse collapse show" aria-labelledby="faqHeading1" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                    Browse our equipment, select what you need, and book it for your preferred dates. Pickup or have it delivered!
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="faqHeading2">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse2" aria-expanded="false" aria-controls="faqCollapse2">
+                    What are the rental rates?
+                </button>
+            </h2>
+            <div id="faqCollapse2" class="accordion-collapse collapse" aria-labelledby="faqHeading2" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                    Our rates vary by equipment type and rental duration. Check the product details for pricing.
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="faqHeading3">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse3" aria-expanded="false" aria-controls="faqCollapse3">
+                    Do you offer delivery services?
+                </button>
+            </h2>
+            <div id="faqCollapse3" class="accordion-collapse collapse" aria-labelledby="faqHeading3" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                    Yes, we offer delivery and pickup services for an additional fee based on location.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
