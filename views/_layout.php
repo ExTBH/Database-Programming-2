@@ -33,7 +33,7 @@
 
             <a href="/trackrental/Index" class="btn d-flex align-items-center justify-content-center px-3 h-100 text-sm font-weight-bold rounded-lg hover-bg-light">My Rentals</a>
 
-            <a href="/userprofile/Index" class="btn fs-2 d-flex h-100 text-center align-items-center justify-content-center">
+            <a href="/profile.php" class="btn fs-2 d-flex h-100 text-center align-items-center justify-content-center">
                 <i class="fa-solid fa-circle-user text-3xl"></i>
             </a>
         </div>
