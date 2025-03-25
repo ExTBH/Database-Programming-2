@@ -1,5 +1,5 @@
 <?php
+require_once __DIR__ . '/controllers/HomeController.php';
 
-$view = new stdClass();
-$view->pageTitle = 'Homepage';
-require_once('Views/index.phtml');
+$controller = new HomeController();
+$controller->index();

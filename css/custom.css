@@ -1,0 +1,13 @@
+.max-w-screen-lg {
+    max-width: 1140px;
+}
+
+.hover-bg-success:hover {
+    background-color: #32c96d;
+    /* or any desired shade */
+}
+
+.hover-bg-light:hover {
+    background-color: #d4e5d4;
+    /* or any desired shade */
+}
