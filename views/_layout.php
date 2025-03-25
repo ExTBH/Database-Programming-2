@@ -26,7 +26,7 @@
             <a class="btn h4 font-weight-bold" href="/">Bahrent</a>
         </div>
         <div class="d-flex justify-content-end align-items-center gap-2">
-            <a href="/login.php" class="btn d-flex align-items-center justify-content-center h-100 px-4 bg-success text-sm font-weight-bold rounded-lg text-dark hover-bg-success">Log in</a>
+            <a href="/login.php" class="btn d-flex align-items-center justify-content-center h-100 px-4 bg-success text-sm font-weight-bold rounded-lg text-white hover-bg-success">Log in</a>
             <a href="/signup.php" class="btn d-flex align-items-center justify-content-center h-100 px-4 bg-light text-sm font-weight-bold rounded-lg text-dark hover-bg-light">Sign up</a>
 
             <a href="/admindashboard/Index" class="btn d-flex align-items-center justify-content-center px-3 h-100 text-sm font-weight-bold rounded-lg hover-bg-light">Dashboard</a>
