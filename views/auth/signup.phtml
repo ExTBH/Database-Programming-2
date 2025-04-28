@@ -1,9 +1,13 @@
+<?php
+
+$prefix = "/~u202203102/Project"; ?>
+
 <div class="d-flex flex-column align-items-center justify-content-center min-vh-100 bg-light">
     <div class="card w-100" style="max-width: 28rem;">
         <div class="card-body">
             <h1 class="card-title text-dark text-center mb-4">Welcome to Bahrent</h1>
 
-            <form method="post" action="/signup.php">
+            <form method="post" action="<?php echo $prefix?>/signup.php">
                 <div class="row">
                     <!-- First Name Field -->
                     <div class="col-sm-6 mb-3">

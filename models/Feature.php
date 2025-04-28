@@ -2,9 +2,9 @@
 
 class Feature
 {
-    public string $icon;
-    public string $title;
-    public string $description;
+    public $icon;
+    public $title;
+    public $description;
 
     public function __construct(string $icon, string $title, string $description)
     {

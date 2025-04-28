@@ -12,14 +12,27 @@ class LoginController extends BaseController
         include __DIR__ . '/../views/_layout.php';
     }
 
-    public function login($email, $password)
-    {
-        // $user = $this->getUser($email, $password);
-        // if ($user) {
-        // $_SESSION['user'] = $user;
-        // header('Location: /');
-        // } else {
-        echo "Please implement the login method.";
-        // }
+   public function login($email, $password)
+{
+    session_start();
+
+    $user = User::getByEmail($email);
+
+    if ($user) {
+        // You also need to fetch the hashed password to verify
+        $conn = Database::getInstance()->getConnection();
+        $stmt = $conn->prepare("SELECT password FROM users WHERE email = ?");
+        $stmt->execute([$email]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($row && password_verify($password, $row['password'])) {
+            $_SESSION['user'] = $user;
+            header('Location: /index.php');
+            exit();
+        }
     }
+    echo "Incorrect email or password.";
+}
+
+    
 }
