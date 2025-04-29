@@ -1,5 +1,5 @@
 <?php
-include_once 'BaseController.php';
+require_once 'BaseController.php';
 
 class ProfileController extends BaseController
 {

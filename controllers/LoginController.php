@@ -1,5 +1,7 @@
 <?php
-include_once 'BaseController.php';
+require_once 'BaseController.php';
+require_once __DIR__ . '/../models/User.php';
+require_once __DIR__ . '/../config.php';
 
 class LoginController extends BaseController
 {
@@ -12,27 +14,25 @@ class LoginController extends BaseController
         include __DIR__ . '/../views/_layout.php';
     }
 
-   public function login($email, $password)
-{
-    session_start();
+    public function login($email, $password)
+    {
+        session_start();
 
-    $user = User::getByEmail($email);
+        $user = User::getByEmail($email);
 
-    if ($user) {
-        // You also need to fetch the hashed password to verify
-        $conn = Database::getInstance()->getConnection();
-        $stmt = $conn->prepare("SELECT password FROM users WHERE email = ?");
-        $stmt->execute([$email]);
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($user) {
+            // You also need to fetch the hashed password to verify
+            $conn = Database::getInstance()->getConnection();
+            $stmt = $conn->prepare("SELECT password FROM users WHERE email = ?");
+            $stmt->execute([$email]);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($row && password_verify($password, $row['password'])) {
-            $_SESSION['user'] = $user;
-            header('Location: /index.php');
-            exit();
+            if ($row && password_verify($password, $row['password'])) {
+                $_SESSION[USER_SESSION_KEY] = $user;
+                header('Location: ' . PREFIX . '/index.php');
+                exit();
+            }
         }
+        echo "Incorrect email or password.";
     }
-    echo "Incorrect email or password.";
-}
-
-    
 }

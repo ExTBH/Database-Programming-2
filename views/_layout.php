@@ -1,10 +1,7 @@
 <?php
-$prefix = "/~u202203102/Project";
+require_once __DIR__ . '/../config.php';
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
+session_start();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -13,8 +10,8 @@ error_reporting(E_ALL);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($title) ?></title>
-<link rel="stylesheet" href="/~u202203102/Project/css/bootstrap.min.css">
-<link rel="stylesheet" href="/~u202203102/Project/css/custom.css">
+    <link rel="stylesheet" href="<?= PREFIX ?>/css/bootstrap.min.css">
+    <link rel="stylesheet" href="<?= PREFIX ?>/css/custom.css">
 
 
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" as="style">
@@ -27,19 +24,21 @@ error_reporting(E_ALL);
     <header class="d-flex justify-content-between align-items-center border-bottom border-light px-4 py-3 bg-white">
         <div class="d-flex align-items-center gap-3 text-dark">
             <i class="fa-solid fa-truck-moving fs-3"></i>
-            <a class="btn h4 font-weight-bold" href="<?php echo $prefix ?>/index.php">Bahrent</a>
+            <a class="btn h4 font-weight-bold" href="<?php echo PREFIX ?>/index.php">Bahrent</a>
         </div>
         <div class="d-flex justify-content-end align-items-center gap-2">
-            <a href="<?php echo $prefix ?>/login.php" class="btn d-flex align-items-center justify-content-center h-100 px-4 bg-success text-sm font-weight-bold rounded-lg text-white hover-bg-success">Log in</a>
-            <a href="<?php echo $prefix ?>/signup.php" class="btn d-flex align-items-center justify-content-center h-100 px-4 bg-light text-sm font-weight-bold rounded-lg text-dark hover-bg-light">Sign up</a>
+            <?php if (!isset($_SESSION[USER_SESSION_KEY])): ?>
+                <a href="<?php echo PREFIX ?>/login.php" class="btn d-flex align-items-center justify-content-center h-100 px-4 bg-success text-sm font-weight-bold rounded-lg text-white hover-bg-success">Log in</a>
+                <a href="<?php echo PREFIX ?>/signup.php" class="btn d-flex align-items-center justify-content-center h-100 px-4 bg-light text-sm font-weight-bold rounded-lg text-dark hover-bg-light">Sign up</a>
+            <?php else: ?>
+                <a href="<?php echo PREFIX ?>/admindashboard/Index" class="btn d-flex align-items-center justify-content-center px-3 h-100 text-sm font-weight-bold rounded-lg hover-bg-light">Dashboard</a>
+                <a href="<?php echo PREFIX ?>/trackrental/Index" class="btn d-flex align-items-center justify-content-center px-3 h-100 text-sm font-weight-bold rounded-lg hover-bg-light">My Rentals</a>
+                <a href="<?php echo PREFIX ?>/profile.php" class="btn fs-2 d-flex h-100 text-center align-items-center justify-content-center">
+                    <i class="fa-solid fa-circle-user text-3xl"></i>
+                </a>
+            <?php endif; ?>
 
-            <a href="<?php echo $prefix ?>/admindashboard/Index" class="btn d-flex align-items-center justify-content-center px-3 h-100 text-sm font-weight-bold rounded-lg hover-bg-light">Dashboard</a>
 
-            <a href="<?php echo $prefix ?>/trackrental/Index" class="btn d-flex align-items-center justify-content-center px-3 h-100 text-sm font-weight-bold rounded-lg hover-bg-light">My Rentals</a>
-
-            <a href="<?php echo $prefix ?>/profile.php" class="btn fs-2 d-flex h-100 text-center align-items-center justify-content-center">
-                <i class="fa-solid fa-circle-user text-3xl"></i>
-            </a>
         </div>
     </header>
 
@@ -49,6 +48,6 @@ error_reporting(E_ALL);
 
 </body>
 
-<script src="/~u202203102/Project/js/bootstrap.min.js"></script>
+<script src="<?= PREFIX ?>/js/bootstrap.min.js"></script>
 
 </html>
