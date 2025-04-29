@@ -1,0 +1,15 @@
+<?php
+include_once 'BaseController.php';
+include_once __DIR__ . '/../models/Feature.php';
+
+class HistoryController extends BaseController
+{
+    public function index()
+    {
+        $title = "History";
+        ob_start();
+        include __DIR__ . '/../views/user/history.phtml';
+        $content = ob_get_clean();
+        include __DIR__ . '/../views/_layout.php';
+    }
+}
