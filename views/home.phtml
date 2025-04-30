@@ -1,6 +1,5 @@
 <?php
 require_once __DIR__ . '/../config.php';
-
 ?>
 
 <div class="container my-5">
@@ -9,9 +8,13 @@ require_once __DIR__ . '/../config.php';
 
         <div class="position-absolute bottom-0 start-0 p-4 text-white">
             <h1 class="display-4 fw-bold text-shadow">Rent from BAHRENT</h1>
-            <p class="fs-5 mb-4 text-shadow">Find the perfect gear for your next project</p>
+            <p class="fs-5 mb-4 text-shadow">Find the perfect charger for your carw</p>
 
-            <a href="/login.php" class="btn btn-success btn-lg fw-bold">Rent Equipment</a>
+            <?php if (isset($_SESSION[USER_SESSION_KEY])): ?>
+                <a href="<?= PREFIX ?>/rent.php" class="btn btn-success btn-lg fw-bold">Rent a Charger</a>
+            <?php else: ?>
+                <a href="<?= PREFIX ?>/login.php" class="btn btn-success btn-lg fw-bold">Rent a Charger</a>
+            <?php endif; ?>
         </div>
     </div>
 

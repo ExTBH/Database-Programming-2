@@ -6,7 +6,7 @@ class HistoryController extends BaseController
 {
     public function index()
     {
-        $title = "History";
+        $title = "My Rent History";
         ob_start();
         include __DIR__ . '/../views/user/history.phtml';
         $content = ob_get_clean();

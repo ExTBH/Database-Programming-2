@@ -1,7 +1,5 @@
 <?php
 require_once __DIR__ . '/../config.php';
-
-session_start();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -28,17 +26,15 @@ session_start();
         </div>
         <div class="d-flex justify-content-end align-items-center gap-2">
             <?php if (!isset($_SESSION[USER_SESSION_KEY])): ?>
-                <a href="<?php echo PREFIX ?>/login.php" class="btn d-flex align-items-center justify-content-center h-100 px-4 bg-success text-sm font-weight-bold rounded-lg text-white hover-bg-success">Log in</a>
-                <a href="<?php echo PREFIX ?>/signup.php" class="btn d-flex align-items-center justify-content-center h-100 px-4 bg-light text-sm font-weight-bold rounded-lg text-dark hover-bg-light">Sign up</a>
+                <a href="<? PREFIX ?>/login.php" class="btn d-flex align-items-center justify-content-center h-100 px-4 bg-success text-sm font-weight-bold rounded-lg text-white hover-bg-success">Log in</a>
+                <a href="<? PREFIX ?>/signup.php" class="btn d-flex align-items-center justify-content-center h-100 px-4 bg-light text-sm font-weight-bold rounded-lg text-dark hover-bg-light">Sign up</a>
             <?php else: ?>
-                <a href="<?php echo PREFIX ?>/admindashboard/Index" class="btn d-flex align-items-center justify-content-center px-3 h-100 text-sm font-weight-bold rounded-lg hover-bg-light">Dashboard</a>
-                <a href="<?php echo PREFIX ?>/trackrental/Index" class="btn d-flex align-items-center justify-content-center px-3 h-100 text-sm font-weight-bold rounded-lg hover-bg-light">My Rentals</a>
-                <a href="<?php echo PREFIX ?>/profile.php" class="btn fs-2 d-flex h-100 text-center align-items-center justify-content-center">
+                <a href="<? PREFIX ?>/admindashboard/Index" class="btn d-flex align-items-center justify-content-center px-3 h-100 text-sm font-weight-bold rounded-lg hover-bg-light">Dashboard</a>
+                <a href="<? PREFIX ?>/history.php" class="btn d-flex align-items-center justify-content-center px-3 h-100 text-sm font-weight-bold rounded-lg hover-bg-light">My Rentals</a>
+                <a href="<? PREFIX ?>/profile.php" class="btn fs-2 d-flex h-100 text-center align-items-center justify-content-center">
                     <i class="fa-solid fa-circle-user text-3xl"></i>
                 </a>
             <?php endif; ?>
-
-
         </div>
     </header>
 
