@@ -1,21 +1,57 @@
 <?php
-require_once __DIR__ . '/../Database.php';
+require_once __DIR__ . '/../database.php';
+
+enum UserRole: string
+{
+    case ADMIN = 'admin';
+    case USER = 'user';
+    case HOME_OWNER = 'homeowner';
+}
 
 class User
 {
-    public $id;
-    public $FirstName;
-    public $LastName;
-    public $email;
-    public $role;
+    public string $id;
+    public string $firstName;
+    public string $lastName;
+    public string $email;
+    public string $role;
 
-    public function __construct($FirstName, $LastName, $email, $role)
+    public function __construct(string $id, string $firstName, string $lastName, string $email, UserRole $role)
     {
-
-        $this->FirstName = $FirstName;
-        $this->LastName = $LastName;
+        $this->id = $id;
+        $this->firstName = $firstName;
+        $this->lastName = $lastName;
         $this->email = $email;
-        $this->role = $role;
+        $this->role = $role->value;
+    }
+
+    public static function fromRow(array $row): User
+    {
+        return new User(
+            $row['user_id'],
+            $row['first_name'],
+            $row['last_name'],
+            $row['email'],
+            UserRole::from($row['role'])
+        );
+    }
+
+    public static function fromSession(): ?User
+    {
+        if (!isset($_SESSION[USER_SESSION_KEY])) {
+
+            return null;
+        }
+
+        $user = $_SESSION[USER_SESSION_KEY];
+        return $user;
+        // return new User(
+        //     $user->id,
+        //     $user->firstName,
+        //     $user->lastName,
+        //     $user->email,
+        //     UserRole::from($user->role)
+        // );
     }
 
 
@@ -28,13 +64,7 @@ class User
         $users = [];
 
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $users[] = new User(
-                $row['id'],
-                $row['FirstName'],
-                $row['LastName'],
-                $row['email'],
-                $row['role']
-            );
+            $users[] = self::fromRow($row);
         }
         return $users;
     }
@@ -46,13 +76,7 @@ class User
         $stmt->execute([$id]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        return $row ? new User(
-            $row['id'],
-            $row['FirstName'],
-            $row['LastName'],
-            $row['email'],
-            $row['role']
-        ) : null;
+        return $row ? self::fromRow($row) : null;
     }
 
     public static function getByEmail($email)
@@ -62,12 +86,6 @@ class User
         $stmt->execute([$email]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        return $row ? new User(
-            $row['id'],
-            $row['FirstName'],
-            $row['LastName'],
-            $row['email'],
-            $row['role']
-        ) : null;
+        return $row ? self::fromRow($row) : null;
     }
 }

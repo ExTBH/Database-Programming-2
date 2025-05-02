@@ -3,8 +3,8 @@
         <h1 class="text-dark fw-bold mb-4">My Rentals</h1>
 
         <!-- Active Rentals Section -->
-        <h4 class="text-dark fw-bold mb-3">Active Rentals</h4>
-        <?php if (count($ongoingRentals) > 0): ?>
+        <!-- <h4 class="text-dark fw-bold mb-3">Active Rentals</h4> -->
+        <?php if (count($rentals) > 0): ?>
             <table class="table table-bordered table-hover" id="rents-table">
                 <thead class="table-success">
                     <tr>
@@ -17,7 +17,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($ongoingRentals as $rental): ?>
+                    <?php foreach ($rentals as $rental): ?>
                         <tr>
                             <td class="text-success fw-bold">#<?= htmlspecialchars($rental['RentalTransactionId']) ?></td>
                             <td>
@@ -39,12 +39,12 @@
                     <?php endforeach; ?>
                 </tbody>
             </table>
-        <?php else: ?>
+        <? else: ?>
             <p class="text-muted">Nothing to show here...</p>
-        <?php endif; ?>
+        <? endif; ?>
 
         <!-- Rental History Section -->
-        <h4 class="text-dark fw-bold mt-5 mb-3">Rental History</h4>
+        <!-- <h4 class="text-dark fw-bold mt-5 mb-3">Rental History</h4>
         <?php if (!empty($rentalHistory)): ?>
             <table class="table table-bordered table-hover">
                 <thead class="table-success">
@@ -86,5 +86,5 @@
         <?php else: ?>
             <p class="text-muted">Nothing to show here...</p>
         <?php endif; ?>
+    </div> -->
     </div>
-</div>

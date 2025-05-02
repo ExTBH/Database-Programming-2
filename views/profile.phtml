@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../models/User.php';
 
-session_start();
 ?>
 
 <div class="d-flex flex-grow-1 flex-column align-items-center justify-content-center bg-light">
@@ -12,12 +12,13 @@ session_start();
                 <i class="fa-solid fa-pencil fs-4"></i>
             </div>
 
-            <form action="/profile.php" method="post">
+            <form action="<? PREFIX ?>/profile.php" method="post">
                 <div class="row">
                     <!-- First Name Field -->
                     <div class="col-md-6 mb-3">
                         <label for="first_name" class="form-label">First Name</label>
                         <input type="text" id="first_name" name="first_name" placeholder="First Name" required
+                            value="<?= htmlspecialchars(User::fromSession()->first_name ?? 'null') ?>"
                             class="form-control" />
                     </div>
 
