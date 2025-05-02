@@ -28,7 +28,7 @@ class LoginController extends BaseController
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if ($row && password_verify($password, $row['password'])) {
-                $_SESSION[USER_SESSION_KEY] = $user;
+                $_SESSION[USER_SESSION_KEY] = $user->id;
                 header('Location: ' . PREFIX . '/index.php');
                 exit();
             }

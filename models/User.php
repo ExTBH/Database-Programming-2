@@ -43,15 +43,8 @@ class User
             return null;
         }
 
-        $user = $_SESSION[USER_SESSION_KEY];
-        return $user;
-        // return new User(
-        //     $user->id,
-        //     $user->firstName,
-        //     $user->lastName,
-        //     $user->email,
-        //     UserRole::from($user->role)
-        // );
+        $userId = $_SESSION[USER_SESSION_KEY];
+        return self::getById($userId);
     }
 
 
@@ -72,7 +65,7 @@ class User
     public static function getById($id)
     {
         $conn = Database::getInstance()->getConnection();
-        $stmt = $conn->prepare("SELECT * FROM users WHERE id = ?");
+        $stmt = $conn->prepare("SELECT * FROM users WHERE user_id = ?");
         $stmt->execute([$id]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 

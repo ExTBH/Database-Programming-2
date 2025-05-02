@@ -1,5 +1,6 @@
 <?php
 require_once 'BaseController.php';
+require_once __DIR__ . '/../database.php';
 
 class ProfileController extends BaseController
 {
@@ -14,12 +15,20 @@ class ProfileController extends BaseController
 
     public function update($first_name, $last_name, $email, $password)
     {
-        // $user = $this->getUser($email, $password);
-        // if ($user) {
-        // $_SESSION['user'] = $user;
-        // header('Location: /');
-        // } else {
-        echo "Please implement the Update profile method.";
-        // }
+        $conn = Database::getInstance()->getConnection();
+
+        // Hash the password using the separate method
+        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+        // Update the user in the database
+        $stmt = $conn->prepare("UPDATE users SET first_name = ?, last_name = ?, email = ?, password = ? WHERE user_id = ?");
+        $success = $stmt->execute([$first_name, $last_name, $email, $hashedPassword, $_SESSION[USER_SESSION_KEY]]);
+
+        if ($success) {
+            header('Location: ' . PREFIX . '/profile.php'); // Redirect to homepage
+            exit();
+        } else {
+            echo "Error updating profile.";
+        }
     }
 }
