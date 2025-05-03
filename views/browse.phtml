@@ -1,0 +1,140 @@
+<?php
+require_once __DIR__ . '/../config.php';
+
+// Placeholder categories if needed later
+$categories = [
+    ['CategoryId' => 1, 'Name' => 'Cameras'],
+    ['CategoryId' => 2, 'Name' => 'Lenses'],
+    ['CategoryId' => 3, 'Name' => 'Lighting'],
+];
+?>
+
+<div class="flex-grow-1 d-flex flex-column my-4 w-100 bg-white rounded-lg shadow p-4">
+    <!-- Search Bar -->
+    <label class="w-100 mb-3">
+        <div class="d-flex w-100 align-items-center rounded-lg" style="background:#e8f2ec;">
+            <span class="text-success px-3">
+                <i class="fa-solid fa-magnifying-glass fs-5" style="color:#51946b;"></i>
+            </span>
+            <input type="text" id="search" oninput="filterMarkers()" placeholder="Search by City"
+                class="form-control border-0 bg-transparent text-dark"
+                style="box-shadow:none; color:#0e1a13; background:transparent;" />
+        </div>
+    </label>
+
+    <div id="map" style="height: 500px; width: 100%;"></div>
+</div>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCvnuWjZz1kBBNhVRABrf0uIinrPFeIWCM"></script>
+<script>
+    let map;
+    let markers = [];
+    let evChargers = []; // will be fetched dynamically
+    let infoWindow;
+
+    function initMap() {
+        map = new google.maps.Map(document.getElementById("map"), {
+            center: {
+                lat: 26.2285,
+                lng: 50.5860
+            },
+            zoom: 11,
+        });
+
+        infoWindow = new google.maps.InfoWindow();
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const userLocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+                    map.setCenter(userLocation);
+                    new google.maps.Marker({
+                        position: userLocation,
+                        map: map,
+                        title: "Your Location",
+                        icon: {
+                            path: google.maps.SymbolPath.CIRCLE,
+                            scale: 8,
+                            fillColor: "#4285F4",
+                            fillOpacity: 1,
+                            strokeWeight: 2,
+                            strokeColor: "#fff"
+                        }
+                    });
+                },
+                () => {
+                    alert("Location permission denied. Showing default map center.");
+                }
+            );
+        } else {
+            alert("Geolocation is not supported by this browser.");
+        }
+
+        loadChargers();
+    }
+
+    function loadChargers(query = '') {
+        fetch(`<? PREFIX ?>/browse.php?search=${encodeURIComponent(query)}`)
+            .then(res => res.json())
+            .then(data => {
+                evChargers = data.map(item => ({
+                    name: item.description || `Charger #${item.charge_point_id}`,
+                    lat: item.latitude,
+                    lng: item.longitude,
+                    location: item.address || item.postcode,
+                    image: "https://placehold.co/600x400/EEE/31343C",
+                    rentUrl: `/rent?station=${item.charge_point_id}`
+                }));
+                addMarkers(evChargers);
+            })
+            .catch(err => {
+                console.error('Failed to load chargers:', err);
+                alert("Could not load charger data.");
+            });
+    }
+
+    function addMarkers(data) {
+        markers.forEach(marker => marker.setMap(null));
+        markers = [];
+
+        data.forEach(charger => {
+            const marker = new google.maps.Marker({
+                position: {
+                    lat: charger.lat,
+                    lng: charger.lng
+                },
+                map,
+                title: charger.name
+            });
+
+            marker.addListener("click", () => {
+                const content = `
+                    <div style="min-width:220px;max-width:260px;padding:12px 16px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.12);background:#fff;">
+                        <h6 style="margin:0 0 6px 0;font-size:1.1rem;color:#4285F4;">${charger.name}</h6>
+                        <div style="font-size:0.97rem;color:#333;">
+                            <img src="${charger.image}" alt="${charger.name}" style="width:100%;height:auto;border-radius:8px;margin-bottom:8px;">
+                            <strong>Location:</strong> ${charger.location}<br>
+                            <strong>Latitude:</strong> ${charger.lat}<br>
+                            <strong>Longitude:</strong> ${charger.lng}<br>
+                            <a href="${charger.rentUrl}" style="display:inline-block;margin-top:8px;padding:6px 12px;background:#4285F4;color:#fff;border-radius:4px;text-decoration:none;">Rent Now</a>
+                        </div>
+                    </div>
+                `;
+                infoWindow.setContent(content);
+                infoWindow.open(map, marker);
+            });
+
+            markers.push(marker);
+        });
+    }
+
+    function filterMarkers() {
+        const query = document.getElementById("search").value;
+        loadChargers(query); // Refetch based on search query
+    }
+
+    window.onload = initMap;
+</script>

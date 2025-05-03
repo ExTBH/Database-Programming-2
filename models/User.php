@@ -25,7 +25,7 @@ class User
         $this->role = $role->value;
     }
 
-    public static function fromRow(array $row): User
+    private static function fromRow(array $row): User
     {
         return new User(
             $row['user_id'],
