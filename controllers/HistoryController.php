@@ -8,11 +8,9 @@ class HistoryController extends BaseController
 {
     public function index()
     {
-        $rentals = Rental::getAll();
-        $title = "My Rent History";
-        ob_start();
-        include __DIR__ . '/../views/user/history.phtml';
-        $content = ob_get_clean();
-        include __DIR__ . '/../views/_layout.php';
+        $this->render('user/history', [
+            'title' => 'My Rent History',
+            'rentals' => Rental::getAll()
+        ]);
     }
 }

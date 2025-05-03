@@ -6,11 +6,9 @@ class BrowseController extends BaseController
 {
     public function index()
     {
-        $title = "Browse Chargers";
-        ob_start();
-        include __DIR__ . '/../views/browse.phtml';
-        $content = ob_get_clean();
-        include __DIR__ . '/../views/_layout.php';
+        $this->render('browse', [
+            'title' => 'Browse Chargers'
+        ]);
     }
 
     /**

@@ -7,11 +7,9 @@ class LoginController extends BaseController
 {
     public function index()
     {
-        $title = "Login";
-        ob_start();
-        include __DIR__ . '/../views/auth/login.phtml';
-        $content = ob_get_clean();
-        include __DIR__ . '/../views/_layout.php';
+        $this->render('auth/login', [
+            'title' => 'Login'
+        ]);
     }
 
     public function login($email, $password)

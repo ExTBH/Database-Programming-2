@@ -6,11 +6,9 @@ class ProfileController extends BaseController
 {
     public function index()
     {
-        $title = "Profile Page";
-        ob_start();
-        include __DIR__ . '/../views/profile.phtml';
-        $content = ob_get_clean();
-        include __DIR__ . '/../views/_layout.php';
+        $this->render('profile', [
+            'title' => 'Profile Page'
+        ]);
     }
 
     public function update($first_name, $last_name, $email, $password)

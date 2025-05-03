@@ -17,10 +17,9 @@ class HomeController extends BaseController
             new Feature("fas fa-campground", "Adventure ready", "Rent gear that's built to handle everything from outdoor adventures to professional gigs.")
         ];
 
-        $title = "Home";
-        ob_start();
-        include __DIR__ . '/../views/home.phtml';
-        $content = ob_get_clean();
-        include __DIR__ . '/../views/_layout.php';
+        $this->render('home', [
+            'title' => 'Home',
+            'featuresList' => $featuresList
+        ]);
     }
 }

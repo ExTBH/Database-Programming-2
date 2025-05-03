@@ -1,0 +1,30 @@
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 bg-white p-4 border-end vh-100">
+            <h2 class="fs-4 fw-bold mb-4">Admin Dashboard</h2>
+            <nav class="nav flex-column gap-2">
+                <a href="?section=reports"
+                    class="nav-link text-dark p-2 rounded fw-bold <?= $activeSection === 'reports' ? 'bg-success text-white' : '' ?>">
+                    <i class="fa-solid fa-chart-line me-2"></i>
+                    System Reports
+                </a>
+                <a href="?section=charge-points"
+                    class="nav-link text-dark p-2 rounded fw-bold <?= $activeSection === 'charge-points' ? 'bg-success text-white' : '' ?>">
+                    <i class="fa-solid fa-charging-station me-2"></i>
+                    Manage Charge Points
+                </a>
+                <a href="?section=users"
+                    class="nav-link text-dark p-2 rounded fw-bold <?= $activeSection === 'users' ? 'bg-success text-white' : '' ?>">
+                    <i class="fa-solid fa-users me-2"></i>
+                    Manage User Accounts
+                </a>
+            </nav>
+        </div>
+
+        <!-- Main content -->
+        <div class="col-md-9 col-lg-10 p-4">
+            <?= $sectionContent ?>
+        </div>
+    </div>
+</div>

@@ -11,11 +11,9 @@ class SignupController extends BaseController
 {
     public function index()
     {
-        $title = "Signup";
-        ob_start();
-        include __DIR__ . '/../views/auth/signup.phtml';
-        $content = ob_get_clean();
-        include __DIR__ . '/../views/_layout.php';
+        $this->render('auth/signup', [
+            'title' => 'Signup'
+        ]);
     }
     public function signup($FirstName, $LastName, $email, $password)
     {
