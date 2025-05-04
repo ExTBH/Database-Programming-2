@@ -14,13 +14,36 @@ $categories = [
     <label class="w-100 mb-3">
         <div class="d-flex w-100 align-items-center rounded-lg" style="background:#e8f2ec;">
             <span class="text-success px-3">
-                <i class="fa-solid fa-magnifying-glass fs-5" style="color:#51946b;"></i>
+                <i class="fa-solid fa-magnifying-search fs-5" style="color:#51946b;"></i>
             </span>
-            <input type="text" id="search" oninput="filterMarkers()" placeholder="Search by City"
+            <input type="text" id="search" oninput="filterChargers()" placeholder="Search by Address, Postcode, or Lat/Lng"
                 class="form-control border-0 bg-transparent text-dark"
                 style="box-shadow:none; color:#0e1a13; background:transparent;" />
         </div>
     </label>
+
+    <!-- Filters -->
+    <div class="d-flex gap-3 mb-3">
+        <!-- Price Range Filter -->
+        <div class="d-flex align-items-center gap-2">
+            <div class="input-group">
+                <span class="input-group-text bg-light text-success">BHD</span>
+                <input type="number" id="minPrice" class="form-control" placeholder="Min" step="0.05" min="0" onchange="filterChargers()">
+            </div>
+            <span>-</span>
+            <div class="input-group">
+                <span class="input-group-text bg-light text-success">BHD</span>
+                <input type="number" id="maxPrice" class="form-control" placeholder="Max" step="0.05" min="0" onchange="filterChargers()">
+            </div>
+        </div>
+
+        <!-- Availability Filter -->
+        <select id="availability" class="form-select w-auto" onchange="filterChargers()">
+            <option value="">All Availability</option>
+            <option value="true">Available Only</option>
+            <option value="false">Unavailable Only</option>
+        </select>
+    </div>
 
     <div id="map" style="height: 500px; width: 100%;"></div>
 </div>
@@ -76,19 +99,24 @@ $categories = [
         loadChargers();
     }
 
-    function loadChargers(query = '') {
-        fetch(`<? PREFIX ?>/browse.php?search=${encodeURIComponent(query)}`)
+    function loadChargers() {
+        const query = document.getElementById("search").value;
+        const minPrice = document.getElementById("minPrice").value;
+        const maxPrice = document.getElementById("maxPrice").value;
+        const availability = document.getElementById("availability").value;
+
+        const params = new URLSearchParams({
+            search: query,
+            min_price: minPrice,
+            max_price: maxPrice,
+            availability: availability
+        });
+
+        fetch(`<? PREFIX ?>/browse.php?${params.toString()}`)
             .then(res => res.json())
             .then(data => {
-                evChargers = data.map(item => ({
-                    name: item.description || `Charger #${item.charge_point_id}`,
-                    lat: item.latitude,
-                    lng: item.longitude,
-                    location: item.address || item.postcode,
-                    image: "https://placehold.co/600x400/EEE/31343C",
-                    rentUrl: `/rent?station=${item.charge_point_id}`
-                }));
-                addMarkers(evChargers);
+                evChargers = data; // Store the data
+                addMarkers(data);
             })
             .catch(err => {
                 console.error('Failed to load chargers:', err);
@@ -103,23 +131,35 @@ $categories = [
         data.forEach(charger => {
             const marker = new google.maps.Marker({
                 position: {
-                    lat: charger.lat,
-                    lng: charger.lng
+                    lat: charger.latitude,
+                    lng: charger.longitude
                 },
                 map,
-                title: charger.name
+                title: `Charger #${charger.charge_point_id}`,
+                // Change marker icon based on availability
+                icon: charger.is_available ?
+                    'http://maps.google.com/mapfiles/ms/icons/green-dot.png' : 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
             });
 
             marker.addListener("click", () => {
+                const availability = charger.is_available ?
+                    '<span class="badge bg-success">Available</span>' :
+                    '<span class="badge bg-danger">Unavailable</span>';
+
                 const content = `
                     <div style="min-width:220px;max-width:260px;padding:12px 16px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.12);background:#fff;">
-                        <h6 style="margin:0 0 6px 0;font-size:1.1rem;color:#4285F4;">${charger.name}</h6>
+                        <h6 style="margin:0 0 6px 0;font-size:1.1rem;color:#4285F4;">Charger #${charger.charge_point_id}</h6>
                         <div style="font-size:0.97rem;color:#333;">
-                            <img src="${charger.image}" alt="${charger.name}" style="width:100%;height:auto;border-radius:8px;margin-bottom:8px;">
-                            <strong>Location:</strong> ${charger.location}<br>
-                            <strong>Latitude:</strong> ${charger.lat}<br>
-                            <strong>Longitude:</strong> ${charger.lng}<br>
-                            <a href="${charger.rentUrl}" style="display:inline-block;margin-top:8px;padding:6px 12px;background:#4285F4;color:#fff;border-radius:4px;text-decoration:none;">Rent Now</a>
+                            <strong>Location:</strong> ${charger.address}<br>
+                            <strong>Postcode:</strong> ${charger.postcode}<br>
+                            <strong>Price:</strong> BHD ${charger.price_per_kwh.toFixed(2)}/kWh<br>
+                            <strong>Status:</strong> ${availability}<br>
+                            ${charger.is_available ? 
+                                `<a href="<? PREFIX ?>/rent?charger=${charger.charge_point_id}" 
+                                    style="display:inline-block;margin-top:8px;padding:6px 12px;background:#4285F4;color:#fff;border-radius:4px;text-decoration:none;">
+                                    Rent Now
+                                </a>` : ''
+                            }
                         </div>
                     </div>
                 `;
@@ -131,9 +171,8 @@ $categories = [
         });
     }
 
-    function filterMarkers() {
-        const query = document.getElementById("search").value;
-        loadChargers(query); // Refetch based on search query
+    function filterChargers() {
+        loadChargers();
     }
 
     window.onload = initMap;
