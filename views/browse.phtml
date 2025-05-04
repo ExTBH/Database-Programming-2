@@ -155,7 +155,7 @@ $categories = [
                             <strong>Price:</strong> BHD ${charger.price_per_kwh.toFixed(2)}/kWh<br>
                             <strong>Status:</strong> ${availability}<br>
                             ${charger.is_available ? 
-                                `<a href="<? PREFIX ?>/rent?charger=${charger.charge_point_id}" 
+                                `<a href="<? PREFIX ?>/rent.php?charger=${charger.charge_point_id}" 
                                     style="display:inline-block;margin-top:8px;padding:6px 12px;background:#4285F4;color:#fff;border-radius:4px;text-decoration:none;">
                                     Rent Now
                                 </a>` : ''

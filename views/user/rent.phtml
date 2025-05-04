@@ -1,0 +1,256 @@
+<?php
+// Assuming these variables are passed from the controller
+/* @var $chargePoint ChargePoint */
+/* @var $user User */
+/* @var $customers array */
+
+require_once __DIR__ . '/../../models/User.php';
+
+$user = User::fromSession();
+
+?>
+
+<div class="flex-grow-1 d-flex flex-column my-4 w-100 bg-white rounded shadow p-4">
+    <!-- Charge Point Summary Section -->
+    <div class="d-flex flex-column flex-md-row gap-4 border-bottom pb-4">
+        <!-- Location Map Preview (placeholder) -->
+        <div class="col-md-4">
+            <div id="location-map" class="w-100 rounded shadow" style="height: 200px;"></div>
+        </div>
+
+        <!-- Charge Point Details -->
+        <div class="col-md-8 d-flex flex-column gap-3">
+            <h1 class="fs-3 fw-bold text-dark">Charging Station</h1>
+            <p class="fs-4 fw-semibold text-success">BHD <?php echo number_format($chargePoint->price_per_kwh, 3); ?><span class="fs-6">/kWh</span></p>
+
+            <div class="bg-light rounded p-3">
+                <p class="mb-2"><i class="fa-solid fa-location-dot me-2"></i><?php echo htmlspecialchars($chargePoint->address); ?></p>
+                <p class="mb-0"><i class="fa-solid fa-map-pin me-2"></i>Postcode: <?php echo htmlspecialchars($chargePoint->postcode); ?></p>
+            </div>
+
+            <div class="bg-success-subtle text-success rounded p-3 d-flex align-items-center">
+                <i class="fa-solid fa-circle-info me-2 fs-5"></i>
+                <p class="mb-0">Select your charging date and time below.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rental Date/Time Selection Section -->
+    <div class="mt-4">
+        <h2 class="fs-4 fw-bold text-dark mb-3">Select Date and Time</h2>
+
+        <div class="row gap-4">
+            <!-- Date & Time Selection -->
+            <div class="col-lg-8">
+                <div class="border rounded bg-light p-4">
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Date</label>
+                        <input type="text" id="rental-date" class="form-control" placeholder="Select date">
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Start Time</label>
+                            <input type="text" id="start-time" class="form-control" placeholder="Select start time">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">End Time</label>
+                            <input type="text" id="end-time" class="form-control" placeholder="Select end time">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rental Summary -->
+            <div class="col-lg-4">
+                <div class="bg-light p-4 rounded">
+                    <h3 class="fs-5 fw-bold text-dark mb-3">Rental Summary</h3>
+
+                    <div class="d-flex flex-column gap-3">
+                        <div>
+                            <p class="text-success mb-1">Location:</p>
+                            <p class="fw-semibold text-dark mb-0"><?php echo htmlspecialchars($chargePoint->address); ?></p>
+                        </div>
+
+                        <div>
+                            <p class="text-success mb-1">Selected Date:</p>
+                            <p id="selected-date" class="fw-semibold text-dark mb-0">Not selected</p>
+                        </div>
+
+                        <div>
+                            <p class="text-success mb-1">Time Range:</p>
+                            <p id="time-range" class="fw-semibold text-dark mb-0">Not selected</p>
+                        </div>
+
+                        <div>
+                            <p class="text-success mb-1">Duration:</p>
+                            <p id="duration" class="fw-semibold text-dark mb-0">0 hours</p>
+                        </div>
+
+                        <div class="border-top pt-3">
+                            <div class="d-flex justify-content-between">
+                                <p class="text-success mb-1">Rate per kWh:</p>
+                                <p class="fw-semibold text-dark mb-0">BHD <?php echo number_format($chargePoint->price_per_kwh, 3); ?></p>
+                            </div>
+
+                            <div class="d-flex justify-content-between mt-2">
+                                <p class="text-success mb-1">Estimated Total:</p>
+                                <p id="total-price" class="fs-5 fw-bold text-dark mb-0">BHD 0.000</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Rental Form -->
+                    <form id="rental-form" action="/rent.php" method="post" class="mt-4">
+                        <input type="hidden" name="charge_point_id" value="<?php echo $chargePoint->charge_point_id; ?>">
+                        <input type="hidden" id="rental-date-input" name="date">
+                        <input type="hidden" id="start-time-input" name="start_time">
+                        <input type="hidden" id="end-time-input" name="end_time">
+
+                        <!-- <?php if ($user && $user->role !== UserRole::USER->value): ?>
+                            <div class="mb-3">
+                                <label for="user-select" class="form-label fw-semibold text-dark">Select Customer</label>
+                                <select required id="user-select" name="user_id" class="form-select">
+                                    <?php foreach ($customers as $customer): ?>
+                                        <option value="<?php echo $customer->id; ?>"><?php echo htmlspecialchars($customer->email); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        <?php endif; ?> -->
+
+                        <button type="submit" id="submit-rental" disabled
+                            class="btn btn-success w-100 d-flex align-items-center justify-content-center gap-2">
+                            <i class="fa-solid fa-plug-circle-check"></i>
+                            Confirm Booking
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charge Point Details Section -->
+    <?php if ($chargePoint->description): ?>
+        <div class="mt-4 border-top pt-4">
+            <h2 class="fs-4 fw-bold text-dark mb-3">Charger Details</h2>
+            <p class="text-success mb-0"><?php echo nl2br(htmlspecialchars($chargePoint->description)); ?></p>
+        </div>
+    <?php endif; ?>
+
+    <!-- Rental Policy Section -->
+    <div class="mt-4 border-top pt-4">
+        <h2 class="fs-4 fw-bold text-dark mb-3">Charging Policy</h2>
+
+        <div class="d-flex flex-column gap-2 text-success">
+            <p class="mb-0"><i class="fa-solid fa-circle-check text-success me-2"></i>Charging station must be left in the same condition as found.</p>
+            <p class="mb-0"><i class="fa-solid fa-circle-check text-success me-2"></i>Payment will be calculated based on actual kWh consumed.</p>
+            <p class="mb-0"><i class="fa-solid fa-circle-check text-success me-2"></i>Staying beyond booked time may incur additional charges.</p>
+            <p class="mb-0"><i class="fa-solid fa-circle-check text-success me-2"></i>Cancellations must be made at least 2 hours in advance.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Initialize Google Maps -->
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCvnuWjZz1kBBNhVRABrf0uIinrPFeIWCM"></script>
+
+<!-- Include Flatpickr -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize map
+        const map = new google.maps.Map(document.getElementById('location-map'), {
+            center: {
+                lat: <?php echo $chargePoint->latitude; ?>,
+                lng: <?php echo $chargePoint->longitude; ?>
+            },
+            zoom: 15
+        });
+
+        // Add marker for charge point
+        new google.maps.Marker({
+            position: {
+                lat: <?php echo $chargePoint->latitude; ?>,
+                lng: <?php echo $chargePoint->longitude; ?>
+            },
+            map: map,
+            title: '<?php echo addslashes($chargePoint->address); ?>'
+        });
+
+        // Initialize date picker
+        const datePicker = flatpickr("#rental-date", {
+            minDate: "today",
+            dateFormat: "Y-m-d",
+            onChange: updateSummary
+        });
+
+        // Initialize time pickers
+        const startTimePicker = flatpickr("#start-time", {
+            enableTime: true,
+            noCalendar: true,
+            dateFormat: "H:i",
+            minTime: "09:00",
+            maxTime: "21:00",
+            onChange: updateSummary
+        });
+
+        const endTimePicker = flatpickr("#end-time", {
+            enableTime: true,
+            noCalendar: true,
+            dateFormat: "H:i",
+            minTime: "09:00",
+            maxTime: "22:00",
+            onChange: updateSummary
+        });
+
+        function updateSummary() {
+            const date = datePicker.selectedDates[0];
+            const startTime = startTimePicker.selectedDates[0];
+            const endTime = endTimePicker.selectedDates[0];
+
+            if (date && startTime && endTime) {
+                // Format date for display
+                const dateDisplay = date.toLocaleDateString('en-US', {
+                    weekday: 'short',
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+                document.getElementById('selected-date').textContent = dateDisplay;
+
+                // Format times for display
+                const timeRange = `${startTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })} - ${endTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`;
+                document.getElementById('time-range').textContent = timeRange;
+
+                // Calculate duration in hours
+                const durationHours = (endTime - startTime) / (1000 * 60 * 60);
+                document.getElementById('duration').textContent = `${durationHours.toFixed(1)} hours`;
+
+                // Calculate estimated total (assuming average 7.2 kWh per hour for Level 2 charging)
+                const estimatedKwh = 7.2 * durationHours;
+                const total = estimatedKwh * <?php echo $chargePoint->price_per_kwh; ?>;
+                document.getElementById('total-price').textContent = `BHD ${total.toFixed(3)}`;
+
+                // Set form values
+                document.getElementById('rental-date-input').value = flatpickr.formatDate(date, "Y-m-d");
+                document.getElementById('start-time-input').value = flatpickr.formatDate(startTime, "H:i");
+                document.getElementById('end-time-input').value = flatpickr.formatDate(endTime, "H:i");
+
+                // Enable submit button if end time is after start time
+                document.getElementById('submit-rental').disabled = endTime <= startTime;
+            }
+        }
+
+        // Form submission handling
+        document.getElementById('rental-form').addEventListener('submit', function(e) {
+            const startTime = startTimePicker.selectedDates[0];
+            const endTime = endTimePicker.selectedDates[0];
+
+            if (!datePicker.selectedDates[0] || !startTime || !endTime || endTime <= startTime) {
+                e.preventDefault();
+                alert('Please select valid date and time range');
+            }
+        });
+    });
+</script>
