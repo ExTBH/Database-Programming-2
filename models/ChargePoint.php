@@ -97,4 +97,114 @@ class ChargePoint
 
         return $chargePoints;
     }
+
+    public static function manageChargePoint(
+        string $action,
+        ?int $chargePointId = null,
+        ?int $homeownerId = null,
+        ?string $address = null,
+        ?string $postcode = null,
+        ?float $latitude = null,
+        ?float $longitude = null,
+        ?float $pricePerKwh = null,
+        ?string $description = null,
+        ?bool $isAvailable = null
+    ): bool {
+        $conn = Database::getInstance()->getConnection();
+    
+        try {
+            switch ($action) {
+                case 'add':
+                    if (
+                        $homeownerId === null || !$address || !$postcode ||
+                        $latitude === null || $longitude === null || $pricePerKwh === null || $isAvailable === null
+                    ) {
+                        throw new InvalidArgumentException("Missing required fields for charge point creation");
+                    }
+    
+                    $stmt = $conn->prepare("
+                        INSERT INTO charge_points 
+                            (homeowner_id, address, postcode, latitude, longitude, price_per_kwh, description, is_available, created_at, updated_at)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
+                    ");
+                    return $stmt->execute([
+                        $homeownerId,
+                        $address,
+                        $postcode,
+                        $latitude,
+                        $longitude,
+                        $pricePerKwh,
+                        $description,
+                        (int)$isAvailable
+                    ]);
+    
+                case 'update':
+                    if (!$chargePointId) {
+                        throw new InvalidArgumentException("Charge point ID is required for update");
+                    }
+    
+                    $updates = [];
+                    $params = [];
+    
+                    if ($homeownerId !== null) {
+                        $updates[] = "homeowner_id = ?";
+                        $params[] = $homeownerId;
+                    }
+                    if ($address !== null) {
+                        $updates[] = "address = ?";
+                        $params[] = $address;
+                    }
+                    if ($postcode !== null) {
+                        $updates[] = "postcode = ?";
+                        $params[] = $postcode;
+                    }
+                    if ($latitude !== null) {
+                        $updates[] = "latitude = ?";
+                        $params[] = $latitude;
+                    }
+                    if ($longitude !== null) {
+                        $updates[] = "longitude = ?";
+                        $params[] = $longitude;
+                    }
+                    if ($pricePerKwh !== null) {
+                        $updates[] = "price_per_kwh = ?";
+                        $params[] = $pricePerKwh;
+                    }
+                    if ($description !== null) {
+                        $updates[] = "description = ?";
+                        $params[] = $description;
+                    }
+                    if ($isAvailable !== null) {
+                        $updates[] = "is_available = ?";
+                        $params[] = (int)$isAvailable;
+                    }
+    
+                    if (empty($updates)) {
+                        throw new InvalidArgumentException("No fields provided for update");
+                    }
+    
+                    $updates[] = "updated_at = NOW()";
+                    $params[] = $chargePointId;
+    
+                    $query = "UPDATE charge_points SET " . implode(', ', $updates) . " WHERE charge_point_id = ?";
+                    $stmt = $conn->prepare($query);
+                    return $stmt->execute($params);
+    
+                case 'delete':
+                    if (!$chargePointId) {
+                        throw new InvalidArgumentException("Charge point ID is required for deletion");
+                    }
+    
+                    $stmt = $conn->prepare("DELETE FROM charge_points WHERE charge_point_id = ?");
+                    return $stmt->execute([$chargePointId]);
+    
+                default:
+                    throw new InvalidArgumentException("Invalid action specified");
+            }
+        } catch (PDOException $e) {
+            error_log("ChargePoint management error: " . $e->getMessage());
+            return false;
+        }
+    }
+    
 }
