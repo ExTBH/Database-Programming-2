@@ -2,6 +2,13 @@
 
 require_once __DIR__ . '/../database.php';
 
+enum ApprovalStatus: string
+{
+    case PENDING = 'pending';
+    case APPROVED = 'approved';
+    case REJECTED = 'rejected';
+}
+
 class HomeOwnerRequest
 {
     public int $id;
@@ -10,7 +17,7 @@ class HomeOwnerRequest
     public string $last_name;
     public string $password;
     public string $created_at;
-    public string $approval_status;
+    public ApprovalStatus $approval_status;
     public ?string $rejection_message;
 
     public function __construct(
@@ -20,7 +27,7 @@ class HomeOwnerRequest
         string $last_name,
         string $password,
         string $created_at,
-        string $approval_status,
+        ApprovalStatus $approval_status,
         ?string $rejection_message
     ) {
         $this->id = $id;
@@ -42,7 +49,7 @@ class HomeOwnerRequest
             $row['last_name'],
             $row['password'],
             $row['created_at'],
-            $row['approval_status'],
+            ApprovalStatus::from($row['approval_status']),
             $row['rejection_message']
         );
     }
