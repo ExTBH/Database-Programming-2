@@ -1,7 +1,6 @@
-<?php 
+<?php
 
 require_once __DIR__ . '/../../../models/User.php';
-require_once __DIR__ . '/../../../admin.php';
 
 $users = User::getAll();
 
@@ -17,7 +16,7 @@ $users = User::getAll();
 
 <!-- Users Table -->
 <div class="table-responsive">
-      
+
     <table class="table table-bordered">
         <thead class="table-light">
             <tr>
@@ -32,11 +31,11 @@ $users = User::getAll();
             <?php foreach ($users as $user): ?>
                 <tr>
                     <td>#<?= htmlspecialchars($user->id) ?></td>
-                    <td><?=  htmlspecialchars($user->firstName . ' ' . $user->lastName) ?></td>
-                    <td><?=  htmlspecialchars($user->email) ?></td>
+                    <td><?= htmlspecialchars($user->firstName . ' ' . $user->lastName) ?></td>
+                    <td><?= htmlspecialchars($user->email) ?></td>
                     <td>
                         <?php
-                        $roleClass = match($user->role) {
+                        $roleClass = match ($user->role) {
                             'admin' => 'bg-primary',
                             'homeowner' => 'bg-success',
                             default => 'bg-secondary'
@@ -46,7 +45,7 @@ $users = User::getAll();
                             <?= ucfirst(htmlspecialchars($user->role)) ?>
                         </span>
                     </td>
-                
+
                     <td>
                         <div class="btn-group btn-group-sm">
                             <button type="button" class="btn btn-outline-primary" title="Edit">
@@ -70,43 +69,43 @@ $users = User::getAll();
 <div class="modal fade" id="addUserModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-           <form id="addUserForm" action="<?=PREFIX?>/admin.php" method="POST">
-    <div class="modal-header">
-        <h5 class="modal-title">Add New User</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-    </div>
-    <div class="modal-body">
-        <div class="mb-3">
-            <label class="form-label">First Name</label>
-            <input type="text" name="first_name" class="form-control" required>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Last Name</label>
-            <input type="text" name="last_name" class="form-control" required>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Email</label>
-            <input type="email" name="email" class="form-control" required>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Password</label>
-            <input type="password" name="password" class="form-control" required>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Role</label>
-            <select name="role" class="form-select" required>
-                <option value="">Select Role</option>
-                <option value="admin">Admin</option>
-                <option value="homeowner">Homeowner</option>
-                <option value="user">User</option>
-            </select>
-        </div>
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="submit" class="btn btn-success">Add User</button>
-    </div>
-</form>
+            <form id="addUserForm" action="<?= PREFIX ?>/admin.php" method="POST">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">First Name</label>
+                        <input type="text" name="first_name" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Last Name</label>
+                        <input type="text" name="last_name" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" name="email" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input type="password" name="password" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Role</label>
+                        <select name="role" class="form-select" required>
+                            <option value="">Select Role</option>
+                            <option value="admin">Admin</option>
+                            <option value="homeowner">Homeowner</option>
+                            <option value="user">User</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Add User</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

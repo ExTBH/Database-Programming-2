@@ -10,7 +10,7 @@ error_reporting(E_ALL);
 define('PREFIX', ''); // for mac or local server
 
 
-define('DB_HOST', 'localhost'); // if doesnt work use `localhost`
+define('DB_HOST', '127.0.0.1'); // if doesnt work use `localhost`
 define('DB_NAME', 'db202203102');
 define('DB_USER', 'u202203102');
 define('DB_PASS', 'u202203102');
