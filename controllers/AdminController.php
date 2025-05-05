@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/BaseController.php';
+require_once __DIR__ . '/../models/User.php';
 
 class AdminController extends BaseController
 {
@@ -64,8 +65,7 @@ class AdminController extends BaseController
 
     private function manageUserAccounts(): string
     {
-        $users = []; // TODO: Get from database
-
+        $user = []; // TODO: Get from database
         ob_start();
         require __DIR__ . '/../views/admin/sections/user_accounts.phtml';
         return ob_get_clean();

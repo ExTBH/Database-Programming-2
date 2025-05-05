@@ -47,8 +47,6 @@ class User
         return self::getById($userId);
     }
 
-
-
     public static function getAll()
     {
         $conn = Database::getInstance()->getConnection();
@@ -80,5 +78,85 @@ class User
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
         return $row ? self::fromRow($row) : null;
+    }   
+    
+    public static function manageUser(
+    string $action, 
+    ?string $userId = null, 
+    ?string $firstName = null, 
+    ?string $lastName = null,
+    ?string $email = null,
+    ?UserRole $role = null,
+    ?string $password = null
+): bool {
+    $conn = Database::getInstance()->getConnection();
+    
+    try {
+        switch ($action) {
+            case 'add':
+                if (!$firstName || !$lastName || !$email || !$role || !$password) {
+                    throw new InvalidArgumentException("Missing required fields for user creation");
+                }
+                
+                $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+                $stmt = $conn->prepare(
+                    "INSERT INTO users (first_name, last_name, email, role, password) 
+                     VALUES (?, ?, ?, ?, ?)"
+                );
+                return $stmt->execute([$firstName, $lastName, $email, $role->value, $hashedPassword]);
+                
+            case 'update':
+                if (!$userId) {
+                    throw new InvalidArgumentException("User ID is required for update");
+                }
+                
+                $updates = [];
+                $params = [];
+                
+                if ($firstName) {
+                    $updates[] = "first_name = ?";
+                    $params[] = $firstName;
+                }
+                if ($lastName) {
+                    $updates[] = "last_name = ?";
+                    $params[] = $lastName;
+                }
+                if ($email) {
+                    $updates[] = "email = ?";
+                    $params[] = $email;
+                }
+                if ($role) {
+                    $updates[] = "role = ?";
+                    $params[] = $role->value;
+                }
+                if ($password) {
+                    $updates[] = "password = ?";
+                    $params[] = password_hash($password, PASSWORD_DEFAULT);
+                }
+                
+                if (empty($updates)) {
+                    throw new InvalidArgumentException("No fields provided for update");
+                }
+                
+                $params[] = $userId;
+                $query = "UPDATE users SET " . implode(', ', $updates) . " WHERE user_id = ?";
+                $stmt = $conn->prepare($query);
+                return $stmt->execute($params);
+                
+            case 'delete':
+                if (!$userId) {
+                    throw new InvalidArgumentException("User ID is required for deletion");
+                }
+                
+                $stmt = $conn->prepare("DELETE FROM users WHERE user_id = ?");
+                return $stmt->execute([$userId]);
+                
+            default:
+                throw new InvalidArgumentException("Invalid action specified");
+        }
+    } catch (PDOException $e) {
+        error_log("User management error: " . $e->getMessage());
+        return false;
     }
+}
 }

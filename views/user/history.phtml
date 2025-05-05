@@ -3,7 +3,6 @@
         <h1 class="text-dark fw-bold mb-4">My Rentals</h1>
 
         <!-- Active Rentals Section -->
-        <!-- <h4 class="text-dark fw-bold mb-3">Active Rentals</h4> -->
         <?php if (count($rentals) > 0): ?>
             <table class="table table-bordered table-hover" id="rents-table">
                 <thead class="table-success">
@@ -39,9 +38,9 @@
                     <?php endforeach; ?>
                 </tbody>
             </table>
-        <? else: ?>
+        <?php else: ?>
             <p class="text-muted">Nothing to show here...</p>
-        <? endif; ?>
+        <?php endif; ?>
 
         <!-- Rental History Section -->
         <!-- <h4 class="text-dark fw-bold mt-5 mb-3">Rental History</h4>
@@ -85,6 +84,6 @@
             </table>
         <?php else: ?>
             <p class="text-muted">Nothing to show here...</p>
-        <?php endif; ?>
-    </div> -->
+        <?php endif; ?> -->
     </div>
+</div>
