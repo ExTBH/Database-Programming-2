@@ -1,0 +1,61 @@
+<div class="container mt-4">
+    <h2 class="mb-4">My Bookings</h2>
+
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead class="table-light">
+                <tr>
+                    <th>Booking ID</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Status</th>
+                    <th>Total Price</th>
+                </tr>
+            </thead>
+            <tbody id="bookings-table-body">
+                <!-- Dynamically populated -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    function updateBookings() {
+        fetch('<?= PREFIX ?>/booking.php?action=get_bookings')
+            .then(response => response.json())
+            .then(data => {
+                const tbody = document.getElementById('bookings-table-body');
+                tbody.innerHTML = data.bookings.map(booking => `
+                    <tr>
+                        <td>#${booking.id}</td>
+                        <td>${booking.start_time}</td>
+                        <td>${booking.end_time}</td>
+                        <td>
+                            <span class="badge ${getBadgeClass(booking.status)}">
+                                ${booking.status.toUpperCase()}
+                            </span>
+                        </td>
+                        <td>BHD ${booking.total_price.toFixed(3)}</td>
+                    </tr>
+                `).join('');
+            })
+            .catch(error => {
+                console.error('Error fetching bookings:', error);
+            });
+    }
+
+    function getBadgeClass(status) {
+        return {
+            'pending': 'bg-warning',
+            'approved': 'bg-success',
+            'denied': 'bg-danger',
+            'completed': 'bg-info'
+        } [status] || 'bg-secondary';
+    }
+
+    // Initial load
+    updateBookings();
+
+    // Refresh every second
+    setInterval(updateBookings, 1000);
+</script>
