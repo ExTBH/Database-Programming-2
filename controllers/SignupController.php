@@ -1,11 +1,9 @@
 <?php
 
-
 require_once __DIR__ . '/BaseController.php';
 require_once __DIR__ . '/../database.php';
 require_once __DIR__ . '/../models/User.php';
 require_once __DIR__ . '/../config.php';
-
 
 class SignupController extends BaseController
 {
@@ -15,6 +13,7 @@ class SignupController extends BaseController
             'title' => 'Signup'
         ]);
     }
+
     public function signup($FirstName, $LastName, $email, $password)
     {
         $conn = Database::getInstance()->getConnection();
@@ -25,7 +24,9 @@ class SignupController extends BaseController
         $existingUser = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($existingUser) {
-            echo "Email already exists. Please choose another one.";
+            http_response_code(409); // Conflict
+            header('Content-Type: application/json');
+            echo json_encode(['error' => 'Email already exists. Please choose another one.']);
             return;
         }
 
@@ -40,13 +41,20 @@ class SignupController extends BaseController
             session_start();
 
             // Auto-login user
-            $_SESSION[USER_SESSION_KEY] = User::getByEmail($email);
+            $_SESSION[USER_SESSION_KEY] = User::getByEmail($email)->id;
 
-            header('Location: ' . PREFIX . ' /index.php'); // Redirect to homepage
+            // Redirect to the home page or dashboard
+            echo json_encode([
+                'redirect' => PREFIX . '/index.php'
+            ]);
+            http_response_code(200); // OK
+
             exit();
         } else {
+            http_response_code(500); // Internal Server Error
+            header('Content-Type: application/json');
             $errorInfo = $stmt->errorInfo();
-            echo "Error creating account: " . $errorInfo[2];  // Show the detailed database error
+            echo json_encode(['error' => "Error creating account: " . $errorInfo[2]]);
         }
     }
 }

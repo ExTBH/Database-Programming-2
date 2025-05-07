@@ -4,54 +4,86 @@ require_once __DIR__ . '/../../config.php';
 
 ?>
 
-<div class="d-flex flex-column align-items-center justify-content-center min-vh-100 bg-light">
-    <div class="card w-100" style="max-width: 28rem;">
-        <div class="card-body">
-            <h1 class="card-title text-dark text-center mb-4">Welcome to Bahrent</h1>
-
-            <form method="post" action="<?php echo PREFIX ?>/signup.php">
+<div class="container d-flex align-items-center justify-content-center vh-100">
+    <div class="row justify-content-center w-100">
+        <div class="col-md-6 col-lg-5 bg-white p-4 rounded shadow">
+            <h1 class="text-dark fw-bold text-start pb-3">Sign Up</h1>
+            <form id="signup-form" method="post" action="<?php echo PREFIX ?>/signup.php">
+                <!-- Error Alert -->
+                <div id="signup-error" class="alert alert-danger d-none" role="alert"></div>
                 <div class="row">
                     <!-- First Name Field -->
                     <div class="col-sm-6 mb-3">
-                        <label for="first_name" class="form-label">First Name</label>
+                        <label for="first_name" class="form-label fw-medium">First Name</label>
                         <input type="text" id="first_name" name="first_name" placeholder="First Name" required
-                            class="form-control" />
+                            class="form-control bg-success-subtle border-secondary" />
                     </div>
-
                     <!-- Last Name Field -->
                     <div class="col-sm-6 mb-3">
-                        <label for="last_name" class="form-label">Last Name</label>
+                        <label for="last_name" class="form-label fw-medium">Last Name</label>
                         <input type="text" id="last_name" name="last_name" placeholder="Last Name" required
-                            class="form-control" />
+                            class="form-control bg-success-subtle border-secondary" />
                     </div>
                 </div>
-
                 <!-- Email Input -->
                 <div class="mb-3">
-                    <label for="email" class="form-label">Email</label>
+                    <label for="email" class="form-label fw-medium">Email</label>
                     <input type="email" id="email" name="email" placeholder="Email" required
-                        class="form-control" />
+                        class="form-control bg-success-subtle border-secondary" />
                 </div>
-
                 <!-- Password Input -->
                 <div class="mb-3">
-                    <label for="password" class="form-label">Password</label>
+                    <label for="password" class="form-label fw-medium">Password</label>
                     <input type="password" id="password" name="password" placeholder="Password" required
-                        class="form-control" />
+                        class="form-control bg-success-subtle border-secondary" />
                 </div>
-
                 <!-- Confirm Password Input -->
                 <div class="mb-3">
-                    <label for="confirm_password" class="form-label">Confirm Password</label>
+                    <label for="confirm_password" class="form-label fw-medium">Confirm Password</label>
                     <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password" required
-                        class="form-control" />
+                        class="form-control bg-success-subtle border-secondary" />
                 </div>
-
                 <!-- Sign Up Button -->
                 <div class="d-grid">
                     <button type="submit" class="btn btn-success">Sign up</button>
                 </div>
             </form>
+            <!-- Login Link -->
+            <p class="text-success text-center pt-2">Already have an account?</p>
+            <div class="d-grid">
+                <a href="<?php echo PREFIX; ?>/login.php" class="btn btn-outline-success bg-white border-success text-success">Log In</a>
+            </div>
         </div>
     </div>
 </div>
+
+<script>
+    document.getElementById('signup-form').onsubmit = async function(e) {
+        e.preventDefault();
+        const form = e.target;
+        const errorDiv = document.getElementById('signup-error');
+        errorDiv.classList.add('d-none');
+        errorDiv.textContent = '';
+
+        const formData = new FormData(form);
+
+        try {
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                errorDiv.textContent = data.error || 'An error occurred.';
+                errorDiv.classList.remove('d-none');
+            } else {
+                window.location.href = data.redirect
+            }
+        } catch (err) {
+            errorDiv.textContent = 'Network error. Please try again.';
+            errorDiv.classList.remove('d-none');
+        }
+    };
+</script>

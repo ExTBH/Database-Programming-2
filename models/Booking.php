@@ -2,6 +2,16 @@
 
 require_once __DIR__ . '/../database.php';
 
+
+enum BookingStatus: string
+{
+    case Pending = 'pending';
+    case Approved = 'approved';
+    case Declined = 'declined';
+    case Completed = 'completed';
+    case Cancelled = 'cancelled';
+}
+
 class Booking
 {
     public int $booking_id;
@@ -110,5 +120,40 @@ class Booking
         }
 
         return $bookings;
+    }
+
+    public static function add(
+        int $charge_point_id,
+        int $user_id,
+        DateTime $start_time,
+        DateTime $end_time,
+        BookingStatus $status,
+        ?float $total_price
+    ): Booking {
+        $conn = Database::getInstance()->getConnection();
+        $stmt = $conn->prepare(
+            "INSERT INTO bookings (charge_point_id, user_id, start_time, end_time, status, total_price)
+             VALUES (?, ?, ?, ?, ?, ?)"
+        );
+        $stmt->execute([
+            $charge_point_id,
+            $user_id,
+            $start_time->format('Y-m-d H:i:s'),
+            $end_time->format('Y-m-d H:i:s'),
+            $status,
+            $total_price
+        ]);
+
+        return new Booking(
+            (int)$conn->lastInsertId(),
+            $charge_point_id,
+            $user_id,
+            $start_time,
+            $end_time,
+            $status->value,
+            $total_price,
+            date('Y-m-d H:i:s'),
+            date('Y-m-d H:i:s')
+        );
     }
 }

@@ -1,7 +1,13 @@
 <?php
 require_once __DIR__ . '/controllers/RentController.php';
+require_once __DIR__ . '/config.php';
 
 session_start();
+
+if (!isset($_SESSION[USER_SESSION_KEY])) {
+    header('Location: login.php');
+    exit;
+}
 
 $controller = new RentController();
 

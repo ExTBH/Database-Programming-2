@@ -1,39 +1,65 @@
 <?php
 require_once __DIR__ . '/../../config.php';
-
 ?>
-
 
 <div class="container d-flex align-items-center justify-content-center vh-100">
     <div class="row justify-content-center w-100">
         <div class="col-md-6 col-lg-5 bg-white p-4 rounded shadow">
             <h1 class="text-dark fw-bold text-start pb-3">Login</h1>
-            <form method="post" action="<?= PREFIX ?>/login.php">
+            <form id="loginForm" method="post" action="<?= PREFIX ?>/login.php">
+                <!-- Error Alert -->
+                <div id="errorAlert" class="alert alert-danger d-none" role="alert"></div>
                 <!-- Email Input -->
                 <div class="mb-3">
                     <label for="email" class="form-label fw-medium">Email</label>
                     <input type="email" name="email" id="email" class="form-control bg-success-subtle border-secondary" placeholder="Email" required>
                 </div>
-
                 <!-- Password Input -->
                 <div class="mb-3">
                     <label for="password" class="form-label fw-medium">Password</label>
                     <input type="password" name="password" id="password" class="form-control bg-success-subtle border-secondary" placeholder="Password" required>
                 </div>
-
                 <!-- Log in Button -->
                 <div class="d-grid">
                     <button type="submit" class="btn btn-success">Log in</button>
                 </div>
             </form>
-
             <!-- Sign up Link -->
             <p class="text-success text-center pt-2">Don't have an account?</p>
-
             <!-- Sign up Button -->
             <div class="d-grid">
-                    <a href="<?php echo PREFIX; ?>/signup.php" class="btn btn-success">Sign Up</a>
+                <a href="<?php echo PREFIX; ?>/signup.php" class="btn btn-outline-success bg-white border-success text-success">Sign Up</a>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    document.getElementById('loginForm').onsubmit = async function(e) {
+        e.preventDefault();
+        const form = e.target;
+        const errorAlert = document.getElementById('errorAlert');
+        errorAlert.classList.add('d-none');
+        errorAlert.textContent = '';
+
+        const formData = new FormData(form);
+
+        const response = await fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            errorAlert.textContent = data.error || 'An error occurred.';
+            errorAlert.classList.remove('d-none');
+        } else {
+            // Redirect or handle success
+            window.location.href = data.redirect
+        }
+    };
+</script>
