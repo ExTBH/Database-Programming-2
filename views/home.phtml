@@ -8,7 +8,7 @@ require_once __DIR__ . '/../config.php';
 
         <div class="position-absolute bottom-0 start-0 p-4 text-white">
             <h1 class="display-4 fw-bold text-shadow">Rent from BAHRENT</h1>
-            <p class="fs-5 mb-4 text-shadow">Find the perfect charger for your carw</p>
+            <p class="fs-5 mb-4 text-shadow">Find the perfect charger for your car!</p>
 
             <?php if (isset($_SESSION[USER_SESSION_KEY])): ?>
                 <a href="<?= PREFIX ?>/browse.php" class="btn btn-success btn-lg fw-bold">Rent a Charger</a>
@@ -43,36 +43,48 @@ require_once __DIR__ . '/../config.php';
         <div class="accordion-item">
             <h2 class="accordion-header" id="faqHeading1">
                 <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse1" aria-expanded="true" aria-controls="faqCollapse1">
-                    How does the rental process work?
+                    How does the EV charger rental process work?
                 </button>
             </h2>
             <div id="faqCollapse1" class="accordion-collapse collapse show" aria-labelledby="faqHeading1" data-bs-parent="#faqAccordion">
                 <div class="accordion-body">
-                    Browse our equipment, select what you need, and book it for your preferred dates. Pickup or have it delivered!
+                    Browse available EV chargers, select the one that fits your needs, and book it for your desired dates. You can pick up the charger or have it delivered to your location.
                 </div>
             </div>
         </div>
         <div class="accordion-item">
             <h2 class="accordion-header" id="faqHeading2">
                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse2" aria-expanded="false" aria-controls="faqCollapse2">
-                    What are the rental rates?
+                    What are the rental rates for EV chargers?
                 </button>
             </h2>
             <div id="faqCollapse2" class="accordion-collapse collapse" aria-labelledby="faqHeading2" data-bs-parent="#faqAccordion">
                 <div class="accordion-body">
-                    Our rates vary by equipment type and rental duration. Check the product details for pricing.
+                    Rental rates depend on the charger model and rental duration. Please check the charger details page for specific pricing information.
                 </div>
             </div>
         </div>
         <div class="accordion-item">
             <h2 class="accordion-header" id="faqHeading3">
                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse3" aria-expanded="false" aria-controls="faqCollapse3">
-                    Do you offer delivery services?
+                    Do you offer delivery and installation for EV chargers?
                 </button>
             </h2>
             <div id="faqCollapse3" class="accordion-collapse collapse" aria-labelledby="faqHeading3" data-bs-parent="#faqAccordion">
                 <div class="accordion-body">
-                    Yes, we offer delivery and pickup services for an additional fee based on location.
+                    Yes, we offer delivery and optional installation services for an additional fee. You can select these options during the booking process.
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="faqHeading4">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse4" aria-expanded="false" aria-controls="faqCollapse4">
+                    What types of EV chargers are available for rent?
+                </button>
+            </h2>
+            <div id="faqCollapse4" class="accordion-collapse collapse" aria-labelledby="faqHeading4" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                    We offer a variety of Level 1 and Level 2 EV chargers compatible with most electric vehicles. Check the product details for compatibility information.
                 </div>
             </div>
         </div>
