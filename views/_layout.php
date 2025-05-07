@@ -23,10 +23,10 @@ $user = User::fromSession();
 
 <body class="d-flex flex-column min-vh-100 bg-light">
     <header class="d-flex justify-content-between align-items-center border-bottom border-light px-4 py-3 bg-white">
-        <div class="d-flex align-items-center gap-3 text-dark">
+        <a href="<?= PREFIX ?>/index.php" class="d-flex align-items-center gap-3 text-dark text-decoration-none">
             <i class="fa-solid fa-truck-moving fs-3"></i>
-            <a class="btn h4 font-weight-bold" href="<?php echo PREFIX ?>/index.php">Bahrent</a>
-        </div>
+            <span class="fw-bold h4 mb-0 ms-2" style="line-height:1;">Bahrent</span>
+        </a>
         <div class="d-flex justify-content-end align-items-center gap-2">
             <?php if (!isset($_SESSION[USER_SESSION_KEY])): ?>
                 <a href="<?= PREFIX ?>/login.php" class="btn d-flex align-items-center justify-content-center h-100 px-4 bg-success text-sm font-weight-bold rounded-lg text-white hover-bg-success">Log in</a>
