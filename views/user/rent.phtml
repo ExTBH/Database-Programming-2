@@ -13,11 +13,11 @@ $user = User::fromSession();
     <div class="d-flex flex-column flex-md-row gap-4 border-bottom pb-4">
         <!-- Location Map Preview (placeholder) -->
         <div class="col-md-4">
-            <div id="location-map" class="w-100 rounded shadow" style="height: 200px;"></div>
+            <div id="location-map" class="w-100 rounded shadow" style="height: 280px;"></div>
         </div>
 
         <!-- Charge Point Details -->
-        <div class="col-md-8 d-flex flex-column gap-3">
+        <div class="flex-grow-1 d-flex flex-column gap-3">
             <h1 class="fs-3 fw-bold text-dark">Charging Station</h1>
             <p class="fs-4 fw-semibold text-success">BHD <?php echo number_format($chargePoint->price_per_kwh, 3); ?><span class="fs-6">/kWh</span></p>
 
@@ -39,7 +39,7 @@ $user = User::fromSession();
 
         <div class="row gap-4">
             <!-- Date & Time Selection -->
-            <div class="col-lg-8">
+            <div class="">
                 <div class="border rounded bg-light p-4">
                     <div class="mb-4">
                         <label class="form-label fw-bold">Date</label>
@@ -60,7 +60,7 @@ $user = User::fromSession();
             </div>
 
             <!-- Rental Summary -->
-            <div class="col-lg-4">
+            <div class="">
                 <div class="bg-light p-4 rounded">
                     <h3 class="fs-5 fw-bold text-dark mb-3">Rental Summary</h3>
 
