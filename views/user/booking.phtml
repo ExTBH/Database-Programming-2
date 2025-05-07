@@ -9,11 +9,20 @@
                     <th>Start Time</th>
                     <th>End Time</th>
                     <th>Status</th>
-                    <th>Total Price</th>
+                    <th>Price per kWh</th>
                 </tr>
             </thead>
             <tbody id="bookings-table-body">
                 <!-- Dynamically populated -->
+
+                <tr id="loading-row">
+                    <td colspan="5" class="text-center">
+                        <div class="spinner-border text-primary" role="status" style="width: 2rem; height: 2rem;">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <span class="ms-2">Loading bookings...</span>
+                    </td>
+                </tr>
             </tbody>
         </table>
     </div>
@@ -35,7 +44,7 @@
                                 ${booking.status.toUpperCase()}
                             </span>
                         </td>
-                        <td>BHD ${booking.total_price.toFixed(3)}</td>
+                        <td>BHD ${booking.price_per_kwh.toFixed(3)}</td>
                     </tr>
                 `).join('');
             })

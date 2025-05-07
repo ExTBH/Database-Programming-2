@@ -34,7 +34,7 @@ $user = User::fromSession();
             <?php else: ?>
                 <a href="<?= PREFIX ?>/admin.php" class="btn d-flex align-items-center justify-content-center px-3 h-100 text-sm font-weight-bold rounded-lg hover-bg-light">Admin Dashboard</a>
                 <a href="<?= PREFIX ?>/homeowner.php" class="btn d-flex align-items-center justify-content-center px-3 h-100 text-sm font-weight-bold rounded-lg hover-bg-light">Homeowner Dashboard</a>
-                <a href="<?= PREFIX ?>/history.php" class="btn d-flex align-items-center justify-content-center px-3 h-100 text-sm font-weight-bold rounded-lg hover-bg-light">My Rentals</a>
+                <a href="<?= PREFIX ?>/booking.php" class="btn d-flex align-items-center justify-content-center px-3 h-100 text-sm font-weight-bold rounded-lg hover-bg-light">My Bookings</a>
                 <a href="<?= PREFIX ?>/profile.php" class="btn fs-2 d-flex h-100 text-center align-items-center justify-content-center">
                     <i class="fa-solid fa-circle-user text-3xl"></i>
                 </a>

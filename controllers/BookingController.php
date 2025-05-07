@@ -25,7 +25,7 @@ class BookingController extends BaseController
                 'start_time' => $booking->start_time->format('Y-m-d H:i'),
                 'end_time' => $booking->end_time->format('Y-m-d H:i'),
                 'status' => $booking->status,
-                'total_price' => $booking->total_price ?? 0
+                'price_per_kwh' => ChargePoint::getById($booking->charge_point_id)->price_per_kwh,
             ];
         }, $bookings);
 

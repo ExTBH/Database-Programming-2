@@ -51,7 +51,7 @@ class Booking
             (int)$row['user_id'],
             new DateTime($row['start_time']),
             new DateTime($row['end_time']),
-            $row['status'],
+            BookingStatus::from($row['status']),
             $row['created_at'],
             $row['updated_at']
         );
