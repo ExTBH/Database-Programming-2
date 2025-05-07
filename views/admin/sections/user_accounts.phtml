@@ -233,8 +233,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
+               // console.log();
+                     const data = await response.json();
 
-                const data = await response.json();
                 
                 if (data.success) {
                     // Close modal first

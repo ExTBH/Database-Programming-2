@@ -20,6 +20,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email = $_POST['email'] ?? null;
         $role = $_POST['role'] ?? null;
         $userRole = $role ? UserRole::from($role) : null;
+        $user_id = $_POST['user_id'] ?? null;
+
 
         switch ($formId) {
             case 'addUserForm':
@@ -33,7 +35,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 break;
 
             case 'editUserForm':
-                $user_id = $_POST['user_id'] ?? null;
                 if ($user_id) {
                     User::manageUser("update", $user_id, $first_name, $last_name, $email, $userRole);
                     $response = ['success' => true, 'message' => 'User updated successfully.'];
@@ -65,6 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                 
                     try {
+
                         User::manageUser("update", $user_id, null, null, null, null, $new_password);
                         $response = [
                             'success' => true, 
