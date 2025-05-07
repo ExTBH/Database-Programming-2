@@ -15,14 +15,17 @@ class User
     public string $lastName;
     public string $email;
     public string $role;
+    public bool $suspended;
+    
 
-    public function __construct(string $id, string $firstName, string $lastName, string $email, UserRole $role)
+    public function __construct(string $id, string $firstName, string $lastName, string $email, UserRole $role, bool $suspended = false)
     {
         $this->id = $id;
         $this->firstName = $firstName;
         $this->lastName = $lastName;
         $this->email = $email;
         $this->role = $role->value;
+        $this->suspended = $suspended;
     }
 
     private static function fromRow(array $row): User
@@ -32,10 +35,11 @@ class User
             $row['first_name'],
             $row['last_name'],
             $row['email'],
-            UserRole::from($row['role'])
+            UserRole::from($row['role']),
+            (bool)$row['suspended']
         );
     }
-
+    
     public static function fromSession(): ?User
     {
         if (!isset($_SESSION[USER_SESSION_KEY])) {
@@ -87,7 +91,8 @@ class User
     ?string $lastName = null,
     ?string $email = null,
     ?UserRole $role = null,
-    ?string $password = null
+    ?string $password = null,
+    ?bool $suspended = null
 ): bool {
     $conn = Database::getInstance()->getConnection();
     
@@ -100,10 +105,10 @@ class User
                 
                 $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
                 $stmt = $conn->prepare(
-                    "INSERT INTO users (first_name, last_name, email, role, password) 
-                     VALUES (?, ?, ?, ?, ?)"
+                    "INSERT INTO users (first_name, last_name, email, role, password, suspended) 
+                     VALUES (?, ?, ?, ?, ?, ?)"
                 );
-                return $stmt->execute([$firstName, $lastName, $email, $role->value, $hashedPassword]);
+                return $stmt->execute([$firstName, $lastName, $email, $role->value, $hashedPassword, (int)$suspended]);
                 
             case 'update':
                 if (!$userId) {
@@ -132,6 +137,10 @@ class User
                 if ($password) {
                     $updates[] = "password = ?";
                     $params[] = password_hash($password, PASSWORD_DEFAULT);
+                }
+                if ($suspended !== null) {
+                    $updates[] = "suspended = ?";
+                    $params[] = (int)$suspended;
                 }
                 
                 if (empty($updates)) {

@@ -1,12 +1,3 @@
--- phpMyAdmin SQL Dump
--- version 5.1.0
--- https://www.phpmyadmin.net/
---
--- Host: localhost
--- Generation Time: April 28, 2025 at 12:12 PM
--- Server version: 10.3.27-MariaDB
--- PHP Version: 7.2.24
-
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
@@ -16,15 +7,6 @@ SET time_zone = "+00:00";
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8mb4 */;
 
---
--- Database: `db202203102`
---
-
--- --------------------------------------------------------
-
---
--- Table structure for table `bookings`
---
 
 CREATE TABLE `bookings` (
   `booking_id` int(11) NOT NULL,
@@ -38,11 +20,10 @@ CREATE TABLE `bookings` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `charge_points`
---
+INSERT INTO `bookings` (`booking_id`, `charge_point_id`, `user_id`, `start_time`, `end_time`, `status`, `total_price`, `created_at`, `updated_at`) VALUES
+(1, 2, 7, '2025-05-06 09:00:00', '2025-05-06 11:00:00', 'approved', '4.50', '2025-05-05 07:50:50', '2025-05-05 07:50:50'),
+(2, 3, 9, '2025-05-07 14:00:00', '2025-05-07 16:00:00', 'pending', '5.00', '2025-05-05 07:50:50', '2025-05-05 07:50:50'),
+(3, 2, 3, '2025-05-08 18:00:00', '2025-05-08 20:00:00', 'completed', '6.00', '2025-05-05 07:50:50', '2025-05-05 07:50:50');
 
 CREATE TABLE `charge_points` (
   `charge_point_id` int(11) NOT NULL,
@@ -58,11 +39,9 @@ CREATE TABLE `charge_points` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `charge_point_images`
---
+INSERT INTO `charge_points` (`charge_point_id`, `homeowner_id`, `address`, `postcode`, `latitude`, `longitude`, `price_per_kwh`, `description`, `is_available`, `created_at`, `updated_at`) VALUES
+(2, 8, '123 Main St, Capital City', 'CC1001', '26.22340000', '50.58750000', '0.30', 'Covered garage charge point', 1, '2025-05-05 07:50:50', '2025-05-05 07:50:50'),
+(3, 10, '456 Palm Ave, Green Town', 'GT2202', '26.20210000', '50.58220000', '0.25', 'Fast charger under shade', 1, '2025-05-05 07:50:50', '2025-05-05 07:50:50');
 
 CREATE TABLE `charge_point_images` (
   `image_id` int(11) NOT NULL,
@@ -72,11 +51,20 @@ CREATE TABLE `charge_point_images` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
--- --------------------------------------------------------
+CREATE TABLE `HomeOwnerRequests` (
+  `id` int(11) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `first_name` varchar(50) NOT NULL,
+  `last_name` varchar(50) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `approval_status` enum('pending','rejected','approved') NOT NULL DEFAULT 'pending',
+  `rejection_message` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
---
--- Table structure for table `messages`
---
+INSERT INTO `HomeOwnerRequests` (`id`, `email`, `first_name`, `last_name`, `password`, `created_at`, `approval_status`, `rejection_message`) VALUES
+(1, 'future.owner1@example.com', 'Ali', 'Hassan', '$2y$10$FuturePass123', '2025-05-05 07:50:50', 'pending', NULL),
+(2, 'future.owner2@example.com', 'Fatima', 'Yousef', '$2y$10$FuturePass456', '2025-05-05 07:50:50', 'pending', NULL);
 
 CREATE TABLE `messages` (
   `message_id` int(11) NOT NULL,
@@ -88,11 +76,10 @@ CREATE TABLE `messages` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `reviews`
---
+INSERT INTO `messages` (`message_id`, `booking_id`, `sender_id`, `recipient_id`, `message`, `is_read`, `created_at`) VALUES
+(1, 1, 7, 8, 'Hi, I will arrive a bit early, hope that’s okay.', 0, '2025-05-05 07:50:50'),
+(2, 2, 9, 10, 'Can I extend the time if needed?', 0, '2025-05-05 07:50:50'),
+(3, 3, 3, 8, 'Thanks for the great service!', 1, '2025-05-05 07:50:50');
 
 CREATE TABLE `reviews` (
   `review_id` int(11) NOT NULL,
@@ -102,11 +89,9 @@ CREATE TABLE `reviews` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `users`
---
+INSERT INTO `reviews` (`review_id`, `booking_id`, `rating`, `comment`, `created_at`) VALUES
+(1, 3, 5, 'Very smooth experience. Highly recommended.', '2025-05-05 07:50:50'),
+(2, 1, 4, 'Charger worked fine, but location a bit tricky to find.', '2025-05-05 07:50:50');
 
 CREATE TABLE `users` (
   `user_id` int(11) NOT NULL,
@@ -114,139 +99,68 @@ CREATE TABLE `users` (
   `password` varchar(255) NOT NULL,
   `first_name` varchar(50) NOT NULL,
   `last_name` varchar(50) NOT NULL,
-  `role` enum('admin','homeowner','user') NOT NULL
+  `role` enum('admin','homeowner','user') NOT NULL,
+  `suspended` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
--- --------------------------------------------------------
+INSERT INTO `users` (`user_id`, `email`, `password`, `first_name`, `last_name`, `role`, `suspended`) VALUES
+(1, 'admin@admin.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'nothing', 'User', 'homeowner', 0),
+(2, 'lee@lee.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Lee', 'Griffiths', 'homeowner', 0),
+(3, 'user@user.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'User', 'Lee', 'user', 0),
+(4, 'email@gmail.com', '$2y$10$yD.OtOGMKRe6BhudiGbDZ.2jGL06KCSOKKWWlRoOtvQq9VGgaFBUG', 'Maryam', 'K', 'user', 0),
+(5, 'emai@gmail.com', '$2y$10$pg/ZkVq4tTAtTy1zOWZN6Oxvd4pnXFKjHWAFrLxSdUJNvzPT/p6mW', 'Maryam', 'K', 'user', 0),
+(6, 'natheer@gmail.com', '$2y$12$i4NMnKp3mE5It8aBhzYeZ.KQwwwOFGqwLVaCwEh1RWIkdw87T1wpC', 'Natheer', 'Radhi', 'user', 0),
+(7, 'emailll@gmail.com', '$2y$10$X.WlNs4044zKNDhwC8d.Ze99DFIifxXqIZHHnrig8psamPZp/j7hm', 'Maryam', 'K', 'user', 0),
+(8, 'eee@gmail.com', '$2y$10$teCZIgXKcpRbFwTGRPGL5OdTOPDaPn09TVjF8Ua6GcBPHJe/B4Zq6', 'Maryam', 'K', 'user', 0),
+(9, 'u202201969@email.com', '$2y$10$UrtkU.eG7zbthg9c3dSez./NpljI7wNhh7T2cVUlbWJljxpBdE7n.', 'Maryam', 'K', 'user', 0),
+(10, 'lifeasmaryam7@gmail.com', '$2y$10$N2i/ZeJXtGVpU8cuOyTdzuSePsEnRC9QrjSECKSncSBo7n1zV4XD2', 'Maryam', 'K', 'user', 0),
+(13, '22222@gmail.com', '$2y$10$q7EExZGdYSbbN03z5nEpzutayzOZHF65L2yIFk051ujjDkUgPoqxa', 'Maryam', 'K', 'admin', 0),
+(15, 'WW@gmail.com', '11', 'Admin', 'User', 'homeowner', 0),
+(16, 'john.doe@example.com', '$2y$10$drkFk9LtYOPa2idTPWVAy.wnQxhEod44B/8EFiTqXCLZeQNawlwbG', 'soethinf', 'jj', 'homeowner', 0),
+(17, 'admin@example.com', '$2y$10$PA00CI/hhsJ6Qi7KY5FUEu1wqs6Y/I83XqsUBPU0orlRIPp7JFvMO', 'soethinf', 'jj', 'user', 0),
+(18, 'jane.doe@example.com', '$2y$10$abc123hashedpasswordtextxyz', 'Jane', 'Doe', 'user', 0),
+(19, 'john.smith@example.com', '$2y$10$xyz789hashedpasswordtextabc', 'John', 'Smith', 'homeowner', 0),
+(20, 'sara.connor@example.com', '$2y$10$passforSaraXyz1234567890', 'Sara', 'Connor', 'user', 0),
+(21, 'mike.ross@example.com', '$2y$10$MikeHashedPass2024TestData', 'Mike', 'Ross', 'homeowner', 0);
 
---
--- Table structure for table `HomeOwnerRequests`
---
 
-CREATE TABLE `HomeOwnerRequests` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `email` varchar(255) NOT NULL,
-  `first_name` varchar(50) NOT NULL,
-  `last_name` varchar(50) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
-  `approval_status` enum('pending', 'rejected', 'approved') NOT NULL DEFAULT 'pending',
-  `rejection_message` text DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `email_unique` (`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- --------------------------------------------------------
-
--- Dumping data for table `users`
-
-INSERT INTO `users` (`user_id`, `email`, `password`, `first_name`, `last_name`, `role`) VALUES
-(1, 'admin@admin.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Admin', 'User', 'admin'),
-(2, 'lee@lee.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Lee', 'Griffiths', 'homeowner'),
-(3, 'user@user.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'User', 'Lee', 'user'),
-(4, 'email@gmail.com', '$2y$10$yD.OtOGMKRe6BhudiGbDZ.2jGL06KCSOKKWWlRoOtvQq9VGgaFBUG', 'Maryam', 'K', 'user'),
-(5, 'emai@gmail.com', '$2y$10$pg/ZkVq4tTAtTy1zOWZN6Oxvd4pnXFKjHWAFrLxSdUJNvzPT/p6mW', 'Maryam', 'K', 'user'),
-(6, 'natheer@gmail.com', '$2y$12$Fcvz7e4Fm/kEihldSBjhXu4BPL7nsPp9qZRt2SWKaIYetoXdUIC6.', 'Natheer', 'Radhi', 'user');
-
--- --------------------------------------------------------
-
--- Indexes for dumped tables
-
--- Indexes for table `bookings`
 ALTER TABLE `bookings`
   ADD PRIMARY KEY (`booking_id`),
   ADD KEY `charge_point_id` (`charge_point_id`),
   ADD KEY `user_id` (`user_id`);
 
--- Indexes for table `charge_points`
 ALTER TABLE `charge_points`
   ADD PRIMARY KEY (`charge_point_id`),
   ADD KEY `homeowner_id` (`homeowner_id`);
 
--- Indexes for table `charge_point_images`
 ALTER TABLE `charge_point_images`
   ADD PRIMARY KEY (`image_id`),
   ADD KEY `charge_point_id` (`charge_point_id`);
 
--- Indexes for table `messages`
+ALTER TABLE `HomeOwnerRequests`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `email_unique` (`email`);
+
 ALTER TABLE `messages`
   ADD PRIMARY KEY (`message_id`),
   ADD KEY `booking_id` (`booking_id`),
   ADD KEY `sender_id` (`sender_id`),
   ADD KEY `recipient_id` (`recipient_id`);
 
--- Indexes for table `reviews`
 ALTER TABLE `reviews`
   ADD PRIMARY KEY (`review_id`),
   ADD KEY `booking_id` (`booking_id`);
 
--- Indexes for table `users`
 ALTER TABLE `users`
   ADD PRIMARY KEY (`user_id`),
   ADD UNIQUE KEY `email` (`email`);
 
--- Indexes for table `HomeOwnerRequests`
+
 ALTER TABLE `HomeOwnerRequests`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `email_unique` (`email`);
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
--- --------------------------------------------------------
-
--- AUTO_INCREMENT for dumped tables
-
--- AUTO_INCREMENT for table `bookings`
-ALTER TABLE `bookings`
-  MODIFY `booking_id` int(11) NOT NULL AUTO_INCREMENT;
-
--- AUTO_INCREMENT for table `charge_points`
-ALTER TABLE `charge_points`
-  MODIFY `charge_point_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
--- AUTO_INCREMENT for table `charge_point_images`
-ALTER TABLE `charge_point_images`
-  MODIFY `image_id` int(11) NOT NULL AUTO_INCREMENT;
-
--- AUTO_INCREMENT for table `messages`
-ALTER TABLE `messages`
-  MODIFY `message_id` int(11) NOT NULL AUTO_INCREMENT;
-
--- AUTO_INCREMENT for table `reviews`
-ALTER TABLE `reviews`
-  MODIFY `review_id` int(11) NOT NULL AUTO_INCREMENT;
-
--- AUTO_INCREMENT for table `users`
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
-
--- AUTO_INCREMENT for table `HomeOwnerRequests`
-ALTER TABLE `HomeOwnerRequests`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
--- Constraints for dumped tables
-
--- Constraints for table `bookings`
-ALTER TABLE `bookings`
-  ADD CONSTRAINT `bookings_ibfk_1` FOREIGN KEY (`charge_point_id`) REFERENCES `charge_points` (`charge_point_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `bookings_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
-
--- Constraints for table `charge_points`
-ALTER TABLE `charge_points`
-  ADD CONSTRAINT `charge_points_ibfk_1` FOREIGN KEY (`homeowner_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
-
--- Constraints for table `charge_point_images`
-ALTER TABLE `charge_point_images`
-  ADD CONSTRAINT `charge_point_images_ibfk_1` FOREIGN KEY (`charge_point_id`) REFERENCES `charge_points` (`charge_point_id`) ON DELETE CASCADE;
-
--- Constraints for table `messages`
-ALTER TABLE `messages`
-  ADD CONSTRAINT `messages_ibfk_1` FOREIGN KEY (`booking_id`) REFERENCES `bookings` (`booking_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `messages_ibfk_2` FOREIGN KEY (`sender_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `messages_ibfk_3` FOREIGN KEY (`recipient_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
-
--- Constraints for table `reviews`
-ALTER TABLE `reviews`
-  ADD CONSTRAINT `reviews_ibfk_1` FOREIGN KEY (`booking_id`) REFERENCES `bookings` (`booking_id`) ON DELETE CASCADE;
-
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

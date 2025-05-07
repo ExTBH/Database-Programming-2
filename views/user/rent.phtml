@@ -1,8 +1,6 @@
 <?php
 // Assuming these variables are passed from the controller
 /* @var $chargePoint ChargePoint */
-/* @var $user User */
-/* @var $customers array */
 
 require_once __DIR__ . '/../../models/User.php';
 
@@ -100,23 +98,18 @@ $user = User::fromSession();
                         </div>
                     </div>
 
+                    <!-- Error Alert -->
+                    <div id="booking-error" class="alert alert-danger d-none mb-3">
+                        <i class="fa-solid fa-circle-exclamation me-2"></i>
+                        <span class="error-message"></span>
+                    </div>
+
                     <!-- Rental Form -->
-                    <form id="rental-form" action="/rent.php" method="post" class="mt-4">
+                    <form id="rental-form" action="<?= PREFIX ?>/rent.php" method="post" class="mt-4">
                         <input type="hidden" name="charge_point_id" value="<?php echo $chargePoint->charge_point_id; ?>">
                         <input type="hidden" id="rental-date-input" name="date">
                         <input type="hidden" id="start-time-input" name="start_time">
                         <input type="hidden" id="end-time-input" name="end_time">
-
-                        <!-- <?php if ($user && $user->role !== UserRole::USER->value): ?>
-                            <div class="mb-3">
-                                <label for="user-select" class="form-label fw-semibold text-dark">Select Customer</label>
-                                <select required id="user-select" name="user_id" class="form-select">
-                                    <?php foreach ($customers as $customer): ?>
-                                        <option value="<?php echo $customer->id; ?>"><?php echo htmlspecialchars($customer->email); ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-                        <?php endif; ?> -->
 
                         <button type="submit" id="submit-rental" disabled
                             class="btn btn-success w-100 d-flex align-items-center justify-content-center gap-2">
@@ -244,13 +237,41 @@ $user = User::fromSession();
 
         // Form submission handling
         document.getElementById('rental-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
             const startTime = startTimePicker.selectedDates[0];
             const endTime = endTimePicker.selectedDates[0];
 
             if (!datePicker.selectedDates[0] || !startTime || !endTime || endTime <= startTime) {
-                e.preventDefault();
                 alert('Please select valid date and time range');
+                return;
             }
+
+            const errorAlert = document.getElementById('booking-error');
+            const submitBtn = document.getElementById('submit-rental');
+            submitBtn.disabled = true;
+
+            const formData = new FormData(this);
+
+            fetch(this.action, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        errorAlert.classList.remove('d-none');
+                        errorAlert.querySelector('.error-message').textContent = data.error;
+                        submitBtn.disabled = false;
+                    } else {
+                        window.location.href = '<?= PREFIX ?>/history.php';
+                    }
+                })
+                .catch(error => {
+                    errorAlert.classList.remove('d-none');
+                    errorAlert.querySelector('.error-message').textContent = 'An error occurred. Please try again.';
+                    submitBtn.disabled = false;
+                });
         });
     });
 </script>

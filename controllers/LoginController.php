@@ -15,24 +15,30 @@ class LoginController extends BaseController
     }
 
     public function login($email, $password)
-    {
-        session_start();
+{
+    session_start();
 
-        $user = User::getByEmail($email);
+    $user = User::getByEmail($email);
 
-        if ($user) {
-            // You also need to fetch the hashed password to verify
-            $conn = Database::getInstance()->getConnection();
-            $stmt = $conn->prepare("SELECT password FROM users WHERE email = ?");
-            $stmt->execute([$email]);
-            $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            if ($row && password_verify($password, $row['password'])) {
-                $_SESSION[USER_SESSION_KEY] = $user->id;
-                header('Location: ' . PREFIX . '/index.php');
-                exit();
-            }
+    if ($user) {
+        if ($user->suspended) {
+            echo "Your account has been suspended. Please contact support.";
+            return;
         }
-        echo "Incorrect email or password.";
+
+        // Get hashed password
+        $conn = Database::getInstance()->getConnection();
+        $stmt = $conn->prepare("SELECT password FROM users WHERE email = ?");
+        $stmt->execute([$email]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($row && password_verify($password, $row['password'])) {
+            $_SESSION[USER_SESSION_KEY] = $user->id;
+            header('Location: ' . PREFIX . '/index.php');
+            exit();
+        }
     }
+
+    echo "Incorrect email or password.";
+}
 }

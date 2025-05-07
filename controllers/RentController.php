@@ -4,27 +4,36 @@ require_once __DIR__ . '/../models/ChargePoint.php';
 
 class RentController extends BaseController
 {
-    public function index()
+    public function index(int $chargePointId): void
     {
-        $chargePoint = new ChargePoint(
-            1,
-            201,
-            "Building 123, Road 2803, Block 428, Seef",
-            "428",
-            26.2336,
-            50.5860,
-            0.25,
-            "Fast charger near Seef Mall.",
-            true,
-            "2024-06-01 10:00:00",
-            "2024-06-01 10:00:00"
-        );
+        $chargePoint = ChargePoint::getById($chargePointId);
 
+        if (!$chargePoint) {
+            // Handle error: Charge point not found
+            $this->render('error', ['message' => 'Charge point not found.']);
+            return;
+        }
 
         $this->render('user/rent', [
-            'title' => 'My Rentals',
+            'title' => 'Rent Charge Point',
             'chargePoint' => $chargePoint,
-            // 'rentals' => Rental::getAll() // Assuming Rental::getAll() fetches all rentals
         ]);
+    }
+
+    public function add(int $chargePointId, string $date, string $startTime, string $endTime): void
+    {
+        header('Content-Type: application/json');
+
+        // Validate input
+        if (empty($chargePointId) || empty($date) || empty($startTime) || empty($endTime)) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Invalid input.']);
+            return;
+        }
+
+        // Add booking logic here
+        // For example, save to database
+        echo json_encode([]); // Return empty JSON response
+        http_response_code(200);
     }
 }

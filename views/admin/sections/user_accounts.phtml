@@ -1,7 +1,6 @@
-<?php 
+<?php
 
 require_once __DIR__ . '/../../../models/User.php';
-require_once __DIR__ . '/../../../admin.php';
 
 $users = User::getAll();
 
@@ -32,11 +31,11 @@ $users = User::getAll();
             <?php foreach ($users as $user): ?>
                 <tr>
                     <td>#<?= htmlspecialchars($user->id) ?></td>
-                    <td><?=  htmlspecialchars($user->firstName . ' ' . $user->lastName) ?></td>
-                    <td><?=  htmlspecialchars($user->email) ?></td>
+                    <td><?= htmlspecialchars($user->firstName . ' ' . $user->lastName) ?></td>
+                    <td><?= htmlspecialchars($user->email) ?></td>
                     <td>
                         <?php
-                        $roleClass = match($user->role) {
+                        $roleClass = match ($user->role) {
                             'admin' => 'bg-primary',
                             'homeowner' => 'bg-success',
                             default => 'bg-secondary'
@@ -46,7 +45,7 @@ $users = User::getAll();
                             <?= ucfirst(htmlspecialchars($user->role)) ?>
                         </span>
                     </td>
-                
+
                     <td>
                         <div class="btn-group btn-group-sm">
                      
