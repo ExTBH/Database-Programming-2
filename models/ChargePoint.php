@@ -2,6 +2,34 @@
 
 require_once __DIR__ . '/../database.php';
 
+/**
+ * Converts an image file to a Base64-encoded data URL.
+ *
+ * @param string $imagePath Path to the image file
+ * @return string|false The Base64 image URL or false on failure
+ */
+function imageToBase64Url($imagePath)
+{
+    if (!file_exists($imagePath)) {
+        return false;
+    }
+
+    $imageInfo = getimagesize($imagePath);
+    if ($imageInfo === false) {
+        return false; // Not a valid image
+    }
+
+    $mimeType = $imageInfo['mime'];
+    $imageData = file_get_contents($imagePath);
+    if ($imageData === false) {
+        return false;
+    }
+
+    $base64 = base64_encode($imageData);
+    return 'data:' . $mimeType . ';base64,' . $base64;
+}
+
+
 class ChargePoint
 {
     public int $charge_point_id;
@@ -15,6 +43,7 @@ class ChargePoint
     public bool $is_available;
     public string $created_at;
     public string $updated_at;
+    public string $image;
 
     public function __construct(
         int $charge_point_id,
@@ -27,7 +56,8 @@ class ChargePoint
         ?string $description,
         bool $is_available,
         string $created_at,
-        string $updated_at
+        string $updated_at,
+        string $image
     ) {
         $this->charge_point_id = $charge_point_id;
         $this->homeowner_id = $homeowner_id;
@@ -40,6 +70,7 @@ class ChargePoint
         $this->is_available = $is_available;
         $this->created_at = $created_at;
         $this->updated_at = $updated_at;
+        $this->image = $image;
     }
 
     private static function fromRow(array $row): ChargePoint
@@ -55,7 +86,8 @@ class ChargePoint
             $row['description'],
             (bool)$row['is_available'],
             $row['created_at'],
-            $row['updated_at']
+            $row['updated_at'],
+            $row['image'] ?? null
         );
     }
     public static function getAll(): array
@@ -111,7 +143,7 @@ class ChargePoint
         ?bool $isAvailable = null
     ): bool {
         $conn = Database::getInstance()->getConnection();
-    
+
         try {
             switch ($action) {
                 case 'add':
@@ -121,7 +153,7 @@ class ChargePoint
                     ) {
                         throw new InvalidArgumentException("Missing required fields for charge point creation");
                     }
-    
+
                     $stmt = $conn->prepare("
                         INSERT INTO charge_points 
                             (homeowner_id, address, postcode, latitude, longitude, price_per_kwh, description, is_available, created_at, updated_at)
@@ -137,15 +169,15 @@ class ChargePoint
                         $description,
                         (int)$isAvailable
                     ]);
-    
+
                 case 'update':
                     if (!$chargePointId) {
                         throw new InvalidArgumentException("Charge point ID is required for update");
                     }
-    
+
                     $updates = [];
                     $params = [];
-    
+
                     if ($homeownerId !== null) {
                         $updates[] = "homeowner_id = ?";
                         $params[] = $homeownerId;
@@ -178,26 +210,26 @@ class ChargePoint
                         $updates[] = "is_available = ?";
                         $params[] = (int)$isAvailable;
                     }
-    
+
                     if (empty($updates)) {
                         throw new InvalidArgumentException("No fields provided for update");
                     }
-    
+
                     $updates[] = "updated_at = NOW()";
                     $params[] = $chargePointId;
-    
+
                     $query = "UPDATE charge_points SET " . implode(', ', $updates) . " WHERE charge_point_id = ?";
                     $stmt = $conn->prepare($query);
                     return $stmt->execute($params);
-    
+
                 case 'delete':
                     if (!$chargePointId) {
                         throw new InvalidArgumentException("Charge point ID is required for deletion");
                     }
-    
+
                     $stmt = $conn->prepare("DELETE FROM charge_points WHERE charge_point_id = ?");
                     return $stmt->execute([$chargePointId]);
-    
+
                 default:
                     throw new InvalidArgumentException("Invalid action specified");
             }
@@ -206,5 +238,4 @@ class ChargePoint
             return false;
         }
     }
-    
 }
