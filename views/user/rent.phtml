@@ -1,6 +1,4 @@
 <?php
-// Assuming these variables are passed from the controller
-/* @var $chargePoint ChargePoint */
 
 require_once __DIR__ . '/../../models/User.php';
 
@@ -8,12 +6,17 @@ $user = User::fromSession();
 
 ?>
 
-<div class="flex-grow-1 d-flex flex-column my-4 w-100 bg-white rounded shadow p-4">
+<div class="flex-grow-1 d-flex flex-column my-4 w-100 bg-white rounded shadow p-4 gap-4">
     <!-- Charge Point Summary Section -->
     <div class="d-flex flex-column flex-md-row gap-4 border-bottom pb-4">
-        <!-- Location Map Preview (placeholder) -->
+        <!-- Charge Point Image -->
         <div class="col-md-4">
-            <div id="location-map" class="w-100 rounded shadow" style="height: 280px;"></div>
+            <?php if (!empty($chargePoint->image)): ?>
+                <img src="<?php echo htmlspecialchars($chargePoint->image); ?>"
+                    alt="Charge Point Image"
+                    class="w-100 rounded shadow object-fit-cover"
+                    style="height: 280px;">
+            <?php endif; ?>
         </div>
 
         <!-- Charge Point Details -->
@@ -31,6 +34,11 @@ $user = User::fromSession();
                 <p class="mb-0">Select your charging date and time below.</p>
             </div>
         </div>
+    </div>
+
+    <!-- Location Map -->
+    <div class="mb-4 border-bottom pb-4">
+        <div id="location-map" class="w-100 rounded shadow" style="height: 280px;"></div>
     </div>
 
     <!-- Rental Date/Time Selection Section -->

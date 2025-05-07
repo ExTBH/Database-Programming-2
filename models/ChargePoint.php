@@ -140,7 +140,8 @@ class ChargePoint
         ?float $longitude = null,
         ?float $pricePerKwh = null,
         ?string $description = null,
-        ?bool $isAvailable = null
+        ?bool $isAvailable = null,
+        ?string $imagePath = null // <-- New parameter
     ): bool {
         $conn = Database::getInstance()->getConnection();
 
@@ -154,10 +155,12 @@ class ChargePoint
                         throw new InvalidArgumentException("Missing required fields for charge point creation");
                     }
 
+                    $base64Image = $imagePath ? imageToBase64Url($imagePath) : null;
+
                     $stmt = $conn->prepare("
                         INSERT INTO charge_points 
-                            (homeowner_id, address, postcode, latitude, longitude, price_per_kwh, description, is_available, created_at, updated_at)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
+                            (homeowner_id, address, postcode, latitude, longitude, price_per_kwh, description, is_available, created_at, updated_at, image)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW(), ?)
                     ");
                     return $stmt->execute([
                         $homeownerId,
@@ -167,7 +170,8 @@ class ChargePoint
                         $longitude,
                         $pricePerKwh,
                         $description,
-                        (int)$isAvailable
+                        (int)$isAvailable,
+                        $base64Image
                     ]);
 
                 case 'update':
@@ -209,6 +213,11 @@ class ChargePoint
                     if ($isAvailable !== null) {
                         $updates[] = "is_available = ?";
                         $params[] = (int)$isAvailable;
+                    }
+                    if ($imagePath !== null) {
+                        $base64Image = imageToBase64Url($imagePath);
+                        $updates[] = "image = ?";
+                        $params[] = $base64Image;
                     }
 
                     if (empty($updates)) {
