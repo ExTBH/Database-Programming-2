@@ -90,11 +90,6 @@ $user = User::fromSession();
                                 <p class="text-success mb-1">Rate per kWh:</p>
                                 <p class="fw-semibold text-dark mb-0">BHD <?php echo number_format($chargePoint->price_per_kwh, 3); ?></p>
                             </div>
-
-                            <div class="d-flex justify-content-between mt-2">
-                                <p class="text-success mb-1">Estimated Total:</p>
-                                <p id="total-price" class="fs-5 fw-bold text-dark mb-0">BHD 0.000</p>
-                            </div>
                         </div>
                     </div>
 
@@ -219,11 +214,6 @@ $user = User::fromSession();
                 // Calculate duration in hours
                 const durationHours = (endTime - startTime) / (1000 * 60 * 60);
                 document.getElementById('duration').textContent = `${durationHours.toFixed(1)} hours`;
-
-                // Calculate estimated total (assuming average 7.2 kWh per hour for Level 2 charging)
-                const estimatedKwh = 7.2 * durationHours;
-                const total = estimatedKwh * <?php echo $chargePoint->price_per_kwh; ?>;
-                document.getElementById('total-price').textContent = `BHD ${total.toFixed(3)}`;
 
                 // Set form values
                 document.getElementById('rental-date-input').value = flatpickr.formatDate(date, "Y-m-d");

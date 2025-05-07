@@ -49,14 +49,20 @@ class RentController extends BaseController
         $totalPrice = $hours * $chargePoint->price_per_kwh;
         $totalPrice = number_format($totalPrice, 2);
 
-        Booking::add(
-            $chargePointId,
-            User::fromSession()->id,
-            $startDateTime,
-            $endDateTime,
-            BookingStatus::Pending,
-            $totalPrice,
-        );
+        try {
+            Booking::add(
+                $chargePointId,
+                User::fromSession()->id,
+                $startDateTime,
+                $endDateTime,
+                BookingStatus::Pending,
+                $totalPrice,
+            );
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to create booking: ' .   $e->getMessage()]);
+            return;
+        }
 
         // Add booking logic here
         // For example, save to database

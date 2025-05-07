@@ -19,8 +19,7 @@ class Booking
     public int $user_id;
     public DateTime $start_time;
     public DateTime $end_time;
-    public string $status;
-    public ?float $total_price;
+    public BookingStatus $status;
     public string $created_at;
     public string $updated_at;
 
@@ -30,8 +29,7 @@ class Booking
         int $user_id,
         DateTime $start_time,
         DateTime $end_time,
-        string $status,
-        ?float $total_price,
+        BookingStatus $status,
         string $created_at,
         string $updated_at
     ) {
@@ -41,7 +39,6 @@ class Booking
         $this->start_time = $start_time;
         $this->end_time = $end_time;
         $this->status = $status;
-        $this->total_price = $total_price;
         $this->created_at = $created_at;
         $this->updated_at = $updated_at;
     }
@@ -55,7 +52,6 @@ class Booking
             new DateTime($row['start_time']),
             new DateTime($row['end_time']),
             $row['status'],
-            isset($row['total_price']) ? (float)$row['total_price'] : null,
             $row['created_at'],
             $row['updated_at']
         );
@@ -128,20 +124,18 @@ class Booking
         DateTime $start_time,
         DateTime $end_time,
         BookingStatus $status,
-        ?float $total_price
     ): Booking {
         $conn = Database::getInstance()->getConnection();
         $stmt = $conn->prepare(
-            "INSERT INTO bookings (charge_point_id, user_id, start_time, end_time, status, total_price)
-             VALUES (?, ?, ?, ?, ?, ?)"
+            "INSERT INTO bookings (charge_point_id, user_id, start_time, end_time, status)
+             VALUES (?, ?, ?, ?, ?, )"
         );
         $stmt->execute([
             $charge_point_id,
             $user_id,
             $start_time->format('Y-m-d H:i:s'),
             $end_time->format('Y-m-d H:i:s'),
-            $status,
-            $total_price
+            $status->value,
         ]);
 
         return new Booking(
@@ -150,8 +144,7 @@ class Booking
             $user_id,
             $start_time,
             $end_time,
-            $status->value,
-            $total_price,
+            $status,
             date('Y-m-d H:i:s'),
             date('Y-m-d H:i:s')
         );
