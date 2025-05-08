@@ -15,9 +15,9 @@ CREATE TABLE `bookings` (
   `start_time` datetime NOT NULL,
   `end_time` datetime NOT NULL,
   `status` enum('pending','approved','declined','completed','cancelled') DEFAULT 'pending',
-  `total_price` decimal(10,2) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `booking_price` decimal(10,2) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 INSERT INTO `bookings` (`booking_id`, `charge_point_id`, `user_id`, `start_time`, `end_time`, `status`, `total_price`, `created_at`, `updated_at`) VALUES
