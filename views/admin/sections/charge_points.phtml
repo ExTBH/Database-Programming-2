@@ -85,7 +85,7 @@
 <div class="modal fade" id="addChargePointModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form id="addChargePointForm">
+            <form id="addChargePointForm" method="post" action="/admin/charge-points/add">
                 <div class="modal-header">
                     <h5 class="modal-title">Add New Charge Point</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -115,11 +115,29 @@
 
 <script>
     document.getElementById('searchChargePoints').addEventListener('input', function() {
-        // TODO: Implement search functionality
+        const searchTerm = this.value.toLowerCase();
+        const tableRows = document.querySelectorAll('table tbody tr');
+        
+        tableRows.forEach(row => {
+            const location = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+            const owner = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
+            const matches = location.includes(searchTerm) || owner.includes(searchTerm);
+            row.style.display = matches ? '' : 'none';
+        });
     });
 
     document.getElementById('statusFilter').addEventListener('change', function() {
-        // TODO: Implement filter functionality
+        const selectedStatus = this.value.toLowerCase();
+        const tableRows = document.querySelectorAll('table tbody tr');
+        
+        tableRows.forEach(row => {
+            const status = row.querySelector('td:nth-child(5) span').textContent.toLowerCase();
+            if (selectedStatus === '' || status === selectedStatus) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
     });
 
     document.getElementById('addChargePointForm').addEventListener('submit', function(e) {

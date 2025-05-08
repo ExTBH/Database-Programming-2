@@ -157,4 +157,14 @@ class Booking
 
         return $row ? (int)$row['pending_count'] : 0;
     }
+
+        public static function countCompleted(): int
+    {
+        $conn = Database::getInstance()->getConnection();
+        $stmt = $conn->prepare("SELECT COUNT(*) AS completed_count FROM bookings WHERE status = ?");
+        $stmt->execute([BookingStatus::Completed->value]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $row ? (int)$row['completed_count'] : 0;
+    }
 }

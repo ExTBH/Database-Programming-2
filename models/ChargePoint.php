@@ -247,4 +247,15 @@ class ChargePoint
             return false;
         }
     }
+
+    public static function countAll(): int
+    {
+        $conn = Database::getInstance()->getConnection();
+        $stmt = $conn->prepare("SELECT COUNT(*) AS charge_point_count FROM charge_points");
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $row ? (int)$row['charge_point_count'] : 0;
+    }
+
 }

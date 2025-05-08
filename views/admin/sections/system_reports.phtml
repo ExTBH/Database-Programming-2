@@ -1,6 +1,7 @@
 <?php 
 
 require_once __DIR__ . '/../../../models/Booking.php';
+require_once __DIR__ . '/../../../models/ChargePoint.php';
 
 ?>
 <h2 class="fs-4 fw-bold mb-4">System Reports</h2>
@@ -14,7 +15,7 @@ require_once __DIR__ . '/../../../models/Booking.php';
                     <i class="fa-solid fa-users fs-1"></i>
                 </div>
                 <h5 class="card-title">Total Users</h5>
-                <p class="display-6 fw-bold text-success mb-0"><?= User::countAll() ?></p>
+                <p class="display-6 fw-bold text-success mb-0"><?= User::countUsers() ?></p>
             </div>
         </div>
     </div>
@@ -23,10 +24,10 @@ require_once __DIR__ . '/../../../models/Booking.php';
         <div class="card border-success h-100">
             <div class="card-body text-center">
                 <div class="text-success mb-3">
-                    <i class="fa-solid fa-dollar-sign fs-1"></i>
+                    <i class="fa-solid fa-house fs-1"></i>
                 </div>
-                <h5 class="card-title">Today's Revenue</h5>
-                <p class="display-6 fw-bold text-success mb-0">BHD <?= number_format($statistics['profitToday'], 2) ?></p>
+                <h5 class="card-title">Total Home Owners</h5>
+                <p class="display-6 fw-bold text-success mb-0"><?= User::countHomeOwners() ?></p>
             </div>
         </div>
     </div>
@@ -35,10 +36,10 @@ require_once __DIR__ . '/../../../models/Booking.php';
         <div class="card border-success">
             <div class="card-body text-center">
                 <div class="text-success mb-3">
-                    <i class="fa-solid fa-chart-line fs-1"></i>
+                    <i class="fa-solid fa-bolt fs-1"></i>
                 </div>
-                <h5 class="card-title">Total Revenue</h5>
-                <p class="display-6 fw-bold text-success mb-0">BHD <?= number_format($statistics['overallProfit'], 2) ?></p>
+                <h5 class="card-title">Total Charge Points</h5>
+                <p class="display-6 fw-bold text-success mb-0"><?= ChargePoint::countAll() ?></p>
             </div>
         </div>
     </div>
@@ -50,7 +51,7 @@ require_once __DIR__ . '/../../../models/Booking.php';
                     <i class="fa-solid fa-check-circle fs-1"></i>
                 </div>
                 <h5 class="card-title">Completed Bookings</h5>
-                <p class="display-6 fw-bold text-success mb-0"><?= Booking::countPending() ?></p>
+                <p class="display-6 fw-bold text-success mb-0"><?= Booking::countCompleted() ?></p>
             </div>
         </div>
     </div>
@@ -59,9 +60,9 @@ require_once __DIR__ . '/../../../models/Booking.php';
         <div class="card border-success h-100">
             <div class="card-body text-center">
                 <div class="text-success mb-3">
-                    <i class="fa-solid fa-check-circle fs-1"></i>
+                    <i class="fa-solid fa-clock fs-1"></i>
                 </div>
-                <h5 class="card-title">Completed Bookings</h5>
+                <h5 class="card-title">Pending Bookings</h5>
                 <p class="display-6 fw-bold text-success mb-0"><?= Booking::countPending() ?></p>
             </div>
         </div>
