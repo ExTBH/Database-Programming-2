@@ -181,14 +181,26 @@ $user = User::fromSession();
             onChange: updateSummary
         });
 
-        // Initialize time pickers
+        // Initialize time pickers with enhanced validation
         const startTimePicker = flatpickr("#start-time", {
             enableTime: true,
             noCalendar: true,
             dateFormat: "H:i",
             minTime: "09:00",
             maxTime: "21:00",
-            onChange: updateSummary
+            onChange: function(selectedDates, dateStr) {
+                // Update end time minimum when start time changes
+                if (selectedDates[0]) {
+                    endTimePicker.set('minTime', dateStr);
+
+                    // If end time is now invalid, clear it
+                    const endTime = endTimePicker.selectedDates[0];
+                    if (endTime && endTime <= selectedDates[0]) {
+                        endTimePicker.clear();
+                    }
+                }
+                updateSummary();
+            }
         });
 
         const endTimePicker = flatpickr("#end-time", {
@@ -197,15 +209,28 @@ $user = User::fromSession();
             dateFormat: "H:i",
             minTime: "09:00",
             maxTime: "22:00",
-            onChange: updateSummary
+            onChange: function(selectedDates) {
+                updateSummary();
+            }
         });
 
         function updateSummary() {
+            const errorAlert = document.getElementById('booking-error');
             const date = datePicker.selectedDates[0];
             const startTime = startTimePicker.selectedDates[0];
             const endTime = endTimePicker.selectedDates[0];
 
+            // Clear any previous error
+            errorAlert.classList.add('d-none');
+            document.getElementById('submit-rental').disabled = true;
+
             if (date && startTime && endTime) {
+                // Validate time selection
+                if (endTime <= startTime) {
+                    errorAlert.classList.remove('d-none');
+                    errorAlert.querySelector('.error-message').textContent = 'End time must be later than start time';
+                    return;
+                }
                 // Format date for display
                 const dateDisplay = date.toLocaleDateString('en-US', {
                     weekday: 'short',
