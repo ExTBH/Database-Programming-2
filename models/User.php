@@ -173,4 +173,25 @@ public function isSuspended(): bool
 {
     return $this->suspended;
 }
+
+
+public static function countAll(): int
+{
+    $conn = Database::getInstance()->getConnection();
+    $stmt = $conn->prepare("SELECT COUNT(*) AS user_count FROM users");
+    $stmt->execute();
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    return $row ? (int)$row['user_count'] : 0;
+}
+public static function countHomeOwners(): int
+{
+    $conn = Database::getInstance()->getConnection();
+    $stmt = $conn->prepare("SELECT COUNT(*) AS user_count FROM users WHERE role = ?");
+    $stmt->execute([UserRole::HOME_OWNER->value]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    return $row ? (int)$row['user_count'] : 0;
+}
+
 }

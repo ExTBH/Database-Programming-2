@@ -2,7 +2,6 @@
 
 require_once __DIR__ . '/../database.php';
 
-
 enum BookingStatus: string
 {
     case Pending = 'pending';
@@ -99,7 +98,6 @@ class Booking
         return $bookings;
     }
 
-
     public static function getAllForHomeOwnerId(int $home_owner_id): array
     {
         $conn = Database::getInstance()->getConnection();
@@ -148,5 +146,15 @@ class Booking
             date('Y-m-d H:i:s'),
             date('Y-m-d H:i:s')
         );
+    }
+
+        public static function countPending(): int
+    {
+        $conn = Database::getInstance()->getConnection();
+        $stmt = $conn->prepare("SELECT COUNT(*) AS pending_count FROM bookings WHERE status = ?");
+        $stmt->execute([BookingStatus::Pending->value]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $row ? (int)$row['pending_count'] : 0;
     }
 }

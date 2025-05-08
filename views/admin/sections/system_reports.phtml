@@ -1,3 +1,8 @@
+<?php 
+
+require_once __DIR__ . '/../../../models/Booking.php';
+
+?>
 <h2 class="fs-4 fw-bold mb-4">System Reports</h2>
 
 <!-- Statistics Cards -->
@@ -9,7 +14,7 @@
                     <i class="fa-solid fa-users fs-1"></i>
                 </div>
                 <h5 class="card-title">Total Users</h5>
-                <p class="display-6 fw-bold text-success mb-0"><?= $statistics['userCount'] ?></p>
+                <p class="display-6 fw-bold text-success mb-0"><?= User::countAll() ?></p>
             </div>
         </div>
     </div>
@@ -45,7 +50,7 @@
                     <i class="fa-solid fa-check-circle fs-1"></i>
                 </div>
                 <h5 class="card-title">Completed Bookings</h5>
-                <p class="display-6 fw-bold text-success mb-0"><?= $statistics['completedCount'] ?></p>
+                <p class="display-6 fw-bold text-success mb-0"><?= Booking::countPending() ?></p>
             </div>
         </div>
     </div>
@@ -53,11 +58,11 @@
     <div class="col-12 col-md-6">
         <div class="card border-success h-100">
             <div class="card-body text-center">
-                <div class="text-danger mb-3">
-                    <i class="fa-solid fa-exclamation-circle fs-1"></i>
+                <div class="text-success mb-3">
+                    <i class="fa-solid fa-check-circle fs-1"></i>
                 </div>
-                <h5 class="card-title">Overdue Bookings</h5>
-                <p class="display-6 fw-bold text-danger mb-0"><?= $statistics['overdueCount'] ?></p>
+                <h5 class="card-title">Completed Bookings</h5>
+                <p class="display-6 fw-bold text-success mb-0"><?= Booking::countPending() ?></p>
             </div>
         </div>
     </div>

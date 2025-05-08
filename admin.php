@@ -122,6 +122,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             ];
                         }
                         break;
+                        
+                        case 'deleteUser':
+                            $user_id = $_POST['user_id'] ?? null;
+                        
+                            if (!$user_id) {
+                                $response = [
+                                    'success' => false,
+                                    'message' => 'User ID is required'
+                                ];
+                                break;
+                            }
+                        
+                            try {
+                                // Call the manageUser method to delete the user
+                                User::manageUser('delete', $user_id);
+                                $response = [
+                                    'success' => true,
+                                    'message' => 'User deleted successfully'
+                                ];
+                            } catch (Exception $e) {
+                                $response = [
+                                    'success' => false,
+                                    'message' => 'Failed to delete user: ' . $e->getMessage()
+                                ];
+                            }
+                            break;
                     
 
 
