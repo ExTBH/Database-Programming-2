@@ -3,6 +3,7 @@
 require_once 'config.php';
 require_once 'controllers/AdminController.php';
 require_once 'models/User.php';
+require_once 'models/ChargePoint.php';
 
 session_start();
 
@@ -148,10 +149,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 ];
                             }
                             break;
-                    
 
-
-                    
+                            case 'addChargePointForm':
+                                $location = $_POST['location'] ?? null;
+                                $pricePerKwh = $_POST['price_per_kwh'] ?? null;
+                                $description = $_POST['description'] ?? null;
+                            
+                                if (!$location || !$pricePerKwh) {
+                                    echo json_encode(['success' => false, 'message' => 'Location and Price per kWh are required.']);
+                                    exit;
+                                }
+                            
+                                try {
+                                    ChargePoint::manageChargePoint($location, $pricePerKwh, $description);
+                                    echo json_encode(['success' => true, 'message' => 'Charge point added successfully.']);
+                                } catch (Exception $e) {
+                                    echo json_encode(['success' => false, 'message' => 'Failed to add charge point: ' . $e->getMessage()]);
+                                }
+                                
+                                exit;
+                                case 'deleteChargePoint':
+                                $chargePointId = $_POST['charge_point_id'] ?? null;
+                                
+                                if (!$chargePointId) {
+                                    echo json_encode(['success' => false, 'message' => 'Charge Point ID is required.']);
+                                    exit;
+                                }
+                                
+                                try {
+                                    ChargePoint::deleteChargePoint($chargePointId);
+                                    echo json_encode(['success' => true, 'message' => 'Charge point deleted successfully.']);
+                                } catch (Exception $e) {
+                                    echo json_encode(['success' => false, 'message' => 'Failed to delete charge point: ' . $e->getMessage()]);
+                                }
+                                    exit;
+                               
             default:
                 $response['message'] = "Unknown form submission.";
         }
