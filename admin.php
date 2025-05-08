@@ -80,6 +80,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                     break;
 
+                    case 'suspendUser':
+                        $userId = $_POST['user_id'] ?? null;
+                        $suspended = $_POST['suspended'] ?? null;
+                    
+                        if ($userId === null || $suspended === null) {
+                            $response = [
+                                'success' => false,
+                                'message' => 'Missing required fields.'
+                            ];
+                            break;
+                        }
+                    
+                        try {
+                            $success = User::manageUser(
+                                'update',
+                                $userId,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                (bool)$suspended
+                            );
+                    
+                            if ($success) {
+                                $response = [
+                                    'success' => true,
+                                    'message' => 'User suspension status updated.'
+                                ];
+                            } else {
+                                $response = [
+                                    'success' => false,
+                                    'message' => 'Failed to update suspension status.'
+                                ];
+                            }
+                        } catch (Exception $e) {
+                            $response = [
+                                'success' => false,
+                                'message' => 'Error: ' . $e->getMessage()
+                            ];
+                        }
+                        break;
+                    
+
+
+                    
             default:
                 $response['message'] = "Unknown form submission.";
         }

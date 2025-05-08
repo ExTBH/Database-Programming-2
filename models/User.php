@@ -168,4 +168,9 @@ class User
         return false;
     }
 }
+
+public function isSuspended(): bool
+{
+    return $this->suspended;
+}
 }

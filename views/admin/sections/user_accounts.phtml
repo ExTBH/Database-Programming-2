@@ -67,9 +67,18 @@ $users = User::getAll();
                                     title="Reset Password">
                                 <i class="fa-solid fa-key"></i>
                             </button>
-                            <button type="button" class="btn btn-outline-danger" title="Suspend">
-                                <i class="fa-solid fa-ban"></i>
+                            <?php if ($user->isSuspended()== true): ?>
+                            <button class="btn btn-danger suspend-user" data-user-id="<?= $user->id ?>">
+                                <i class="fa-solid fa-check"></i> Suspended
                             </button>
+                            <?php else: ?>
+                            <button class="btn btn-outline-danger suspend-user" data-user-id="<?= $user->id ?>">
+                                <i class="fa-solid fa-ban"></i> Suspend
+                            </button>
+<?php endif; ?>
+
+
+
                         </div>
                     </td>
                 </tr>
@@ -202,6 +211,7 @@ $users = User::getAll();
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    
     // Generic form submission handler
     function handleFormSubmit(formElement, modalId) {
         formElement.addEventListener('submit', async function(e) {
@@ -319,6 +329,53 @@ document.addEventListener('DOMContentLoaded', function() {
             form.replaceWith(newForm);
             handleFormSubmit(newForm, modalId);
         }
+        
+    });
+
+    document.querySelectorAll('.suspend-user').forEach(button => {
+    button.addEventListener('click', async function () {
+        const userId = this.getAttribute('data-user-id');
+        const isCurrentlySuspended = this.classList.contains('btn-danger'); // or check a data attribute
+        const newSuspendedState = isCurrentlySuspended ? '0' : '1';
+
+        const formData = new FormData();
+        formData.append('form_id', 'suspendUser');
+        formData.append('user_id', userId);
+        formData.append('suspended', newSuspendedState);
+
+        try {
+            const response = await fetch('<?=PREFIX?>/admin.php', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                if (newSuspendedState === '1') {
+                    this.classList.remove('btn-outline-danger');
+                    this.classList.add('btn-danger');
+                    this.innerHTML = '<i class="fa-solid fa-check"></i> Suspended';
+                } else {
+                    this.classList.remove('btn-danger');
+                    this.classList.add('btn-outline-danger');
+                    this.innerHTML = '<i class="fa-solid fa-ban"></i> Suspend';
+                }
+
+                alert(data.message);
+            } else {
+                alert(data.message || 'Failed to update user status.');
+            }
+        } catch (err) {
+            console.error(err);
+            alert('An error occurred while updating user status.');
+        }
     });
 });
+
+});
+
 </script>
