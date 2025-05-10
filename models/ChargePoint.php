@@ -258,4 +258,26 @@ class ChargePoint
         return $row ? (int)$row['charge_point_count'] : 0;
     }
 
+ public static function getHomeownerByChargePointId(int $chargePointId): ?array
+{
+    $conn = Database::getInstance()->getConnection();
+    $stmt = $conn->prepare("
+        SELECT u.user_id AS homeowner_id, u.first_name, u.last_name, u.email 
+        FROM charge_points cp
+        INNER JOIN users u ON cp.homeowner_id = u.user_id
+        WHERE cp.charge_point_id = ?
+    ");
+    $stmt->execute([$chargePointId]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    return $row ?: null;
+}
+
+public static function deleteChargePoint(int $chargePointId): bool
+{
+    $conn = Database::getInstance()->getConnection();
+    $stmt = $conn->prepare("DELETE FROM charge_points WHERE charge_point_id = ?");
+    return $stmt->execute([$chargePointId]);
+}
+
 }
