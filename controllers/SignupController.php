@@ -57,4 +57,30 @@ class SignupController extends BaseController
             echo json_encode(['error' => "Error creating account: " . $errorInfo[2]]);
         }
     }
+
+    //create request method
+
+    public function createRequest($first_name, $last_name, $email, $password)
+    {
+        $conn = Database::getInstance()->getConnection();
+        
+        $stmt = $conn->prepare("INSERT INTO HomeOwnerRequets(email, first_name, last_name, password, created_at, approval_status, rejection_message) 
+                               VALUES (?, ?, ?, ?, NOW(), 'pending', NULL)");
+        
+        $success = $stmt->execute([
+            $email,
+            $first_name,
+            $last_name,
+            password_hash($password, PASSWORD_DEFAULT)
+        ]);
+
+        if ($success) {
+            http_response_code(201);
+            echo json_encode(['message' => 'Request submitted successfully']);
+        } else {
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to submit request']);
+        }
+    }
+
 }

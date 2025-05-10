@@ -10,10 +10,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $last_name = isset($_POST['last_name']) ? htmlspecialchars($_POST['last_name']) : null;
     $email = isset($_POST['email']) ? htmlspecialchars($_POST['email']) : null;
     $password = isset($_POST['password']) ? htmlspecialchars($_POST['password']) : null;
+    $is_seller = isset($_POST['seller_checkbox']) ? true : false;
 
     // if fields are present...
     if ($first_name && $last_name && $email && $password) {
-        $controller->signup($first_name, $last_name, $email, $password);
+        if ($is_seller) {
+            $controller->createRequest($first_name, $last_name, $email, $password);
+        } else {
+            $controller->signup($first_name, $last_name, $email, $password);
+        }
     } else {
         echo "All fields are required.";
     }
