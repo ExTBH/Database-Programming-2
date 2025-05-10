@@ -175,11 +175,13 @@ case 'addChargePointForm':
         exit;
     }
 
+    $homeowner = user::getByEmail($homeownerEmail);
+    $homeOwnerId =  $homeowner-> id;
     try {
         ChargePoint::manageChargePoint(
             'add',
             null,
-            null, // homeownerId will be resolved in the method
+            $homeOwnerId, // homeownerId will be resolved in the method
             $location,
             $postcode,
             $latitude,

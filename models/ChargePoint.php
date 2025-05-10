@@ -162,13 +162,15 @@ class ChargePoint
                             (homeowner_id, address, postcode, latitude, longitude, price_per_kwh, description, is_available, created_at, updated_at, image)
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW(), ?)
                     ");
+
+                
                     return $stmt->execute([
                         $homeownerId,
                         $address,
                         $postcode,
                         $latitude,
                         $longitude,
-                        $pricePerKwh,
+                        (float)$pricePerKwh,
                         $description,
                         (int)$isAvailable,
                         $base64Image

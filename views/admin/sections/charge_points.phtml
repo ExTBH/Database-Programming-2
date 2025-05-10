@@ -88,30 +88,57 @@ $AllChargePoints = ChargePoint::getAll();
 <div class="modal fade" id="addChargePointModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form id="addChargePointForm" method="post" action="<?=PREFIX?>/admin.php">
-                <div class="modal-header">
-                    <h5 class="modal-title">Add New Charge Point</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">Location Address</label>
-                        <input type="text" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Price per kWh (BHD)</label>
-                        <input type="number" step="0.001" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Description</label>
-                        <textarea class="form-control" rows="3"></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-success">Add Charge Point</button>
-                </div>
-            </form>
+    
+<form id="addChargePointForm" method="post" action="<?=PREFIX?>/admin.php" enctype="multipart/form-data">
+    <input type="hidden" name="form_id" value="addChargePointForm">
+    <div class="modal-header">
+        <h5 class="modal-title">Add New Charge Point</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    </div>
+    <div class="modal-body">
+        <div class="mb-3">
+            <label class="form-label">Location Address</label>
+            <input type="text" name="location" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Postcode</label>
+            <input type="text" name="postcode" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Latitude</label>
+            <input type="number" name="latitude" step="0.000001" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Longitude</label>
+            <input type="number" name="longitude" step="0.000001" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Price per kWh (BHD)</label>
+            <input type="number" name="price_per_kwh" step="0.001" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Homeowner Email</label>
+            <input type="email" name="homeowner_email" class="form-control" required>
+            <div class="invalid-feedback">This user does not exist or is not a homeowner.</div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea name="description" class="form-control" rows="3"></textarea>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Attach Image</label>
+            <input type="file" name="image" class="form-control" accept="image/*">
+        </div>
+        <div class="form-check mb-3">
+            <input type="checkbox" name="is_available" class="form-check-input" id="isAvailable">
+            <label class="form-check-label" for="isAvailable">Is Available</label>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-success">Add Charge Point</button>
+    </div>
+</form>
         </div>
     </div>
 </div>
@@ -143,11 +170,86 @@ $AllChargePoints = ChargePoint::getAll();
         });
     });
 
-    document.getElementById('addChargePointForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        // TODO: Implement form submission
+   document.getElementById('addChargePointForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const formData = new FormData(this);
+    console.log([...formData.entries()]); // Log form data to ensure all fields are being sent
+
+    try {
+    console.log('Submitting form...'); // Log when the form is being submitted
+    const response = await fetch(this.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
     });
 
+    // Await the response text to log it
+    const responseText = await response.text();
+    console.log('Response received:', responseText); // Log the raw response text
+
+    // Parse the response as JSON
+    const data = JSON.parse(responseText);
+
+    console.log(data); // Log the parsed JSON data
+
+    if (data.success) {
+        alert(data.message);
+        const modal = bootstrap.Modal.getInstance(document.getElementById('addChargePointModal'));
+        modal.hide();
+        this.reset();
+        window.location.reload();
+    } else {
+        alert(data.message || 'An error occurred while adding the charge point.');
+    }
+} catch (error) {
+    console.error('Error:', error);
+    alert('An error occurred while submitting the form.');
+}
+});
+
+document.querySelector('[name="homeowner_email"]').addEventListener('blur', async function () {
+    const emailField = this;
+    const email = emailField.value.trim();
+
+    if (!email) {
+        emailField.classList.remove('is-valid', 'is-invalid');
+        return;
+    }
+
+    try {
+        const formData = new FormData();
+        formData.append('form_id', 'validateHomeownerEmail');
+        formData.append('email', email);
+
+        const response = await fetch('<?=PREFIX?>/admin.php', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            emailField.classList.remove('is-invalid');
+            emailField.classList.add('is-valid');
+            emailField.nextElementSibling.textContent = ''; // Clear error message
+        } else {
+            emailField.classList.remove('is-valid');
+            emailField.classList.add('is-invalid');
+            emailField.nextElementSibling.textContent = data.message; // Show error message
+        }
+    } catch (error) {
+        console.error('Error validating email:', error);
+        emailField.classList.remove('is-valid');
+        emailField.classList.add('is-invalid');
+        emailField.nextElementSibling.textContent = 'An error occurred while validating the email.';
+    }
+});
 
     document.querySelectorAll('.delete-charge-point').forEach(button => {
     button.addEventListener('click', async function () {
@@ -183,5 +285,7 @@ $AllChargePoints = ChargePoint::getAll();
             }
         }
     });
+
+    
 });
 </script>
