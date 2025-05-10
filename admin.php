@@ -150,39 +150,77 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             }
                             break;
 
-                            case 'addChargePointForm':
-                                $location = $_POST['location'] ?? null;
-                                $pricePerKwh = $_POST['price_per_kwh'] ?? null;
-                                $description = $_POST['description'] ?? null;
-                            
-                                if (!$location || !$pricePerKwh) {
-                                    echo json_encode(['success' => false, 'message' => 'Location and Price per kWh are required.']);
-                                    exit;
-                                }
-                            
-                                try {
-                                    ChargePoint::manageChargePoint($location, $pricePerKwh, $description);
-                                    echo json_encode(['success' => true, 'message' => 'Charge point added successfully.']);
-                                } catch (Exception $e) {
-                                    echo json_encode(['success' => false, 'message' => 'Failed to add charge point: ' . $e->getMessage()]);
-                                }
-                                
-                                exit;
-                                case 'deleteChargePoint':
-                                $chargePointId = $_POST['charge_point_id'] ?? null;
-                                
-                                if (!$chargePointId) {
-                                    echo json_encode(['success' => false, 'message' => 'Charge Point ID is required.']);
-                                    exit;
-                                }
-                                
-                                try {
-                                    ChargePoint::deleteChargePoint($chargePointId);
-                                    echo json_encode(['success' => true, 'message' => 'Charge point deleted successfully.']);
-                                } catch (Exception $e) {
-                                    echo json_encode(['success' => false, 'message' => 'Failed to delete charge point: ' . $e->getMessage()]);
-                                }
-                                    exit;
+                       
+case 'addChargePointForm':
+    error_log('addChargePointForm triggered'); // Log when this case is triggered
+
+    $location = $_POST['location'] ?? null;
+    $postcode = $_POST['postcode'] ?? null;
+    $latitude = isset($_POST['latitude']) ? (float)$_POST['latitude'] : null; // Cast to float
+    $longitude = isset($_POST['longitude']) ? (float)$_POST['longitude'] : null; // Cast to float
+    $pricePerKwh = isset($_POST['price_per_kwh']) ? (float)$_POST['price_per_kwh'] : null; // Cast to float
+    $homeownerEmail = $_POST['homeowner_email'] ?? null;
+    $description = $_POST['description'] ?? null;
+    $isAvailable = isset($_POST['is_available']) ? 1 : 0;
+
+    // Read the image file content
+    $imageContent = null;
+    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+        $imageContent = file_get_contents($_FILES['image']['tmp_name']); // Read the raw image content
+    }
+
+    if (!$location || !$postcode || !$latitude || !$longitude || !$pricePerKwh || !$homeownerEmail) {
+        error_log('Missing required fields'); // Log missing fields
+        echo json_encode(['success' => false, 'message' => 'All required fields must be filled.']);
+        exit;
+    }
+
+    try {
+        ChargePoint::manageChargePoint(
+            'add',
+            null,
+            null, // homeownerId will be resolved in the method
+            $location,
+            $postcode,
+            $latitude,
+            $longitude,
+            $pricePerKwh, // Pass the float value
+            $description,
+            $isAvailable,
+            $imageContent // Pass the raw image content directly
+        );
+        echo json_encode(['success' => true, 'message' => 'Charge point added successfully.']);
+    } catch (Exception $e) {
+        error_log('Error adding charge point: ' . $e->getMessage()); // Log exceptions
+        echo json_encode(['success' => false, 'message' => 'Failed to add charge point: ' . $e->getMessage()]);
+    }
+    exit;
+
+case 'validateHomeownerEmail':
+    $email = $_POST['email'] ?? null;
+
+    if (!$email) {
+        echo json_encode(['success' => false, 'message' => 'Email is required.']);
+        exit;
+    }
+
+    try {
+        $conn = Database::getInstance()->getConnection();
+        $stmt = $conn->prepare("SELECT role FROM users WHERE email = ?");
+        $stmt->execute([$email]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$user) {
+            echo json_encode(['success' => false, 'message' => 'This user does not exist.']);
+        } elseif ($user['role'] !== 'homeowner') {
+            echo json_encode(['success' => false, 'message' => 'This user is not a homeowner.']);
+        } else {
+            echo json_encode(['success' => true, 'message' => 'Valid homeowner email.']);
+        }
+    } catch (Exception $e) {
+        echo json_encode(['success' => false, 'message' => 'Error validating email: ' . $e->getMessage()]);
+    }
+    exit;
                                
             default:
                 $response['message'] = "Unknown form submission.";
