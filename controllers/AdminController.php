@@ -5,7 +5,6 @@ require_once __DIR__ . '/../models/User.php';
 
 class AdminController extends BaseController
 {
-    private array $allowedSections = ['reports', 'charge-points', 'users'];
     private string $activeSection;
 
     public function __construct()
@@ -21,14 +20,11 @@ class AdminController extends BaseController
     {
         $this->activeSection = $_GET['section'] ?? 'reports';
 
-        if (!in_array($this->activeSection, $this->allowedSections)) {
-            $this->activeSection = 'reports';
-        }
-
         $sectionContent = match ($this->activeSection) {
             'reports' => $this->systemReports(),
             'charge-points' => $this->manageChargePoints(),
             'users' => $this->manageUserAccounts(),
+            'homeowner-requests' => $this->manageHomeownerRequests(),
             default => $this->systemReports()
         };
 
@@ -65,9 +61,15 @@ class AdminController extends BaseController
 
     private function manageUserAccounts(): string
     {
-        $user = []; // TODO: Get from database
         ob_start();
         require __DIR__ . '/../views/admin/sections/user_accounts.phtml';
+        return ob_get_clean();
+    }
+
+    private function manageHomeownerRequests(): string
+    {
+        ob_start();
+        require __DIR__ . '/../views/admin/sections/homeowner_requests.phtml';
         return ob_get_clean();
     }
 }
