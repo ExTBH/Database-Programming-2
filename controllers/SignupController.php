@@ -64,7 +64,7 @@ class SignupController extends BaseController
     {
         $conn = Database::getInstance()->getConnection();
         
-        $stmt = $conn->prepare("INSERT INTO HomeOwnerRequets(email, first_name, last_name, password, created_at, approval_status, rejection_message) 
+        $stmt = $conn->prepare("INSERT INTO HomeOwnerRequests(email, first_name, last_name, password, created_at, approval_status, rejection_message) 
                                VALUES (?, ?, ?, ?, NOW(), 'pending', NULL)");
         
         $success = $stmt->execute([
@@ -75,8 +75,11 @@ class SignupController extends BaseController
         ]);
 
         if ($success) {
-            http_response_code(201);
-            echo json_encode(['message' => 'Request submitted successfully']);
+            http_response_code(200);
+            echo json_encode([
+                'message' => 'Request submitted successfully'
+                
+            ]);
         } else {
             http_response_code(500);
             echo json_encode(['error' => 'Failed to submit request']);

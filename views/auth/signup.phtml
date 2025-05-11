@@ -45,7 +45,7 @@ require_once __DIR__ . '/../../config.php';
                 </div>
                 <!-- Request to be a Homeowner Checkbox -->
                 <div class="form-check mb-3">
-                    <input type="checkbox" id="request_homeowner" name="request_homeowner" class="form-check-input">
+                    <input type="checkbox" id="request_homeowner" name="request_homeowner" class="form-check-input" value = "1">
                     <label for="request_homeowner" class="form-check-label">Request to be a Homeowner</label>
                 </div>
                 <!-- Sign Up Button -->
@@ -72,11 +72,15 @@ require_once __DIR__ . '/../../config.php';
 
         const formData = new FormData(form);
 
+
+
         try {
             const response = await fetch(form.action, {
                 method: 'POST',
                 body: formData
             });
+
+ 
 
             const data = await response.json();
 
@@ -87,7 +91,7 @@ require_once __DIR__ . '/../../config.php';
                 window.location.href = data.redirect
             }
         } catch (err) {
-            errorDiv.textContent = 'Network error. Please try again.';
+            errorDiv.textContent = err.message;
             errorDiv.classList.remove('d-none');
         }
     };
