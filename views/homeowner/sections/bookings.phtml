@@ -46,7 +46,7 @@ $bookings = Booking::getAllForHomeOwnerId($user->id);
                         };
                         ?>
                         <span class="badge <?= $statusClass ?>">
-                            <?= ucfirst(htmlspecialchars($booking->status)) ?>
+                            <?= ucfirst(htmlspecialchars($booking->status->value)) ?>
                         </span>
                     </td>
                     <td>BHD <?= number_format($booking->total_price ?? 0, 3) ?></td>

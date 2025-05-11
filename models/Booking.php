@@ -126,7 +126,7 @@ class Booking
         $conn = Database::getInstance()->getConnection();
         $stmt = $conn->prepare(
             "INSERT INTO bookings (charge_point_id, user_id, start_time, end_time, status)
-             VALUES (?, ?, ?, ?, ?, )"
+             VALUES (?, ?, ?, ?, ?, ?)"
         );
         $stmt->execute([
             $charge_point_id,
