@@ -86,10 +86,12 @@ $requests = HomeOwnerRequest::getAll();
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-success">
-                        <i class="fa-solid fa-check me-1"></i>
-                        Approve Request
-                    </button>
+                    <button type="submit" class="btn btn-success"
+    data-row-id="<?= htmlspecialchars($request->id) ?>"
+    data-request-id="<?= htmlspecialchars($request->id) ?>">
+    <i class="fa-solid fa-check me-1"></i>
+    Approve Request
+</button>
                 </div>
             </form>
         </div>
@@ -200,6 +202,45 @@ $requests = HomeOwnerRequest::getAll();
                     }
                 });
             }
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const approveButtons = document.querySelectorAll('.btn-success[data-request-id]');
+        approveButtons.forEach(button => {
+            button.addEventListener('click', async function (e) {
+                e.preventDefault();
+
+                const requestId = this.getAttribute('data-request-id');
+                const formData = new FormData();
+                formData.append('form_id', 'approveRequest');
+                formData.append('request_id', requestId);
+
+                try {
+                    const response = await fetch('<?= PREFIX ?>/admin.php', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
+
+                    const data = await response.json();
+                    console.log(data);
+
+                    if (data.success) {
+                        alert('Request approved successfully!');
+                        // Optionally, remove the row or update the UI
+                        const row = document.querySelector(`[data-row-id="${requestId}"]`).closest('tr');
+                        if (row) row.remove();
+                    } else {
+                        alert(data.message || 'An error occurred while approving the request.');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('An error occurred while processing the request.');
+                }
+            });
         });
     });
 </script>

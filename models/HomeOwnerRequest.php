@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../database.php';
+require_once __DIR__ . '/../models/User.php';
 
 enum ApprovalStatus: string
 {
@@ -86,5 +87,46 @@ class HomeOwnerRequest
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
         return $row ? self::fromRow($row) : null;
+    }
+
+    public static function approveRequest(int $id): bool
+    {
+        $conn = Database::getInstance()->getConnection();
+        
+        try {
+            $conn->beginTransaction();
+
+            // Get the request by ID
+            $stmt = $conn->prepare("SELECT * FROM HomeOwnerRequests WHERE id = ?");
+            $stmt->execute([$id]);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$row) {
+                return false;
+            }
+
+            // Update request status to approved
+            $stmt = $conn->prepare("UPDATE HomeOwnerRequests SET approval_status = ? WHERE id = ?");
+            $stmt->execute([ApprovalStatus::APPROVED->value, $id]);
+
+            // Remove id from row before insertion
+            unset($row['id']);
+            unset($row['approval_status']);
+            unset($row['rejection_message']);
+            unset($row['created_at']);
+            $row['role'] = 'homeowner';
+
+            // Create new user entry
+            $columns = implode(', ', array_keys($row));
+            $values = implode(', ', array_fill(0, count($row), '?'));
+            $stmt = $conn->prepare("INSERT INTO Users ($columns) VALUES ($values)");
+            $stmt->execute(array_values($row));
+
+            $conn->commit();
+            return true;
+        } catch (PDOException $e) {
+            $conn->rollBack();
+            return false;
+        }
     }
 }

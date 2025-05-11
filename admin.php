@@ -4,6 +4,7 @@ require_once 'config.php';
 require_once 'controllers/AdminController.php';
 require_once 'models/User.php';
 require_once 'models/ChargePoint.php';
+require_once 'models/HomeOwnerRequest.php';
 
 session_start();
 
@@ -221,6 +222,31 @@ case 'validateHomeownerEmail':
         }
     } catch (Exception $e) {
         echo json_encode(['success' => false, 'message' => 'Error validating email: ' . $e->getMessage()]);
+    }
+    exit;
+
+    case 'approveRequest':
+    $requestId = $_POST['request_id'] ?? null;
+    error_log('Approve Request - Request ID: ' . $requestId);
+    
+
+    if (!$requestId) {
+        echo json_encode(['success' => false, 'message' => 'Request ID is required.']);
+        exit;
+    }
+
+    try {
+        // Call the approveRequest method in HomeOwnerRequest
+        $success = HomeOwnerRequest::approveRequest((int)$requestId);
+
+        error_log('Approve Request - Success: ' . ($success ? 'true' : 'false'));
+        if ($success) {
+            echo json_encode(['success' => true, 'message' => 'Request approved successfully.']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to approve the request.']);
+        }
+    } catch (Exception $e) {
+        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
     }
     exit;
                                
