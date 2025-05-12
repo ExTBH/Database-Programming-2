@@ -282,4 +282,21 @@ public static function deleteChargePoint(int $chargePointId): bool
     return $stmt->execute([$chargePointId]);
 }
 
+public function update(): bool
+{
+    return self::manageChargePoint(
+        'update',
+        $this->charge_point_id,
+        $this->homeowner_id,
+        $this->address,
+        $this->postcode,
+        $this->latitude,
+        $this->longitude,
+        $this->price_per_kwh,
+        $this->description,
+        $this->is_available,
+        $this->image // assumes this is a file path or already base64 if coming from DB
+    );
+}
+
 }

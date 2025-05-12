@@ -199,6 +199,20 @@ case 'addChargePointForm':
     }
     exit;
 
+    if ($_POST['form_id'] === 'editChargePointForm') {
+        // Validate inputs and process the form
+        $charge_point_id = $_POST['charge_point_id'];
+        $location = $_POST['location']; // Add validation here
+        // Process the edit, update the charge point in the database, and send a response
+        echo json_encode([
+            'success' => true,
+            'message' => 'Charge Point updated successfully.',
+            'charge_point_id' => $charge_point_id
+        ]);
+        exit;
+    }
+    
+
 case 'validateHomeownerEmail':
     $email = $_POST['email'] ?? null;
 
@@ -275,6 +289,7 @@ case 'validateHomeownerEmail':
             $response['html'] = $tableHtml;
         }
 
+
     } catch (Exception $e) {
         $response = ['success' => false, 'message' => 'Server error: ' . $e->getMessage()];
     }
@@ -284,6 +299,8 @@ case 'validateHomeownerEmail':
         echo json_encode($response);
         exit;
     }
+
+    
 
     // fallback: full page reload
     $controller->index();
