@@ -4,6 +4,7 @@ require_once __DIR__ . '/BaseController.php';
 require_once __DIR__ . '/../database.php';
 require_once __DIR__ . '/../models/User.php';
 require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../models/HomeOwnerRequest.php';
 
 class SignupController extends BaseController
 {
@@ -23,10 +24,31 @@ class SignupController extends BaseController
         $stmt->execute([$email]);
         $existingUser = $stmt->fetch(PDO::FETCH_ASSOC);
 
+        $existingRequest = HomeOwnerRequest::getByEmail($email);
+
         if ($existingUser) {
             http_response_code(409); // Conflict
             header('Content-Type: application/json');
             echo json_encode(['error' => 'Email already exists. Please choose another one.']);
+            return;
+        }
+
+
+        if ($existingRequest && $existingRequest->approval_status->value == 'pending') {
+            http_response_code(409); // Conflict
+            header('Content-Type: application/json');
+            echo json_encode(['error' => 'Email already exists in the request list. Please wait for approval.']);
+            return;
+        }
+
+         if ($existingRequest && $existingRequest->approval_status->value == 'rejected') {
+
+            error_log("User request is rejected: " . json_encode($existingRequest));
+            http_response_code(409); // Conflict
+            header('Content-Type: application/json');
+            echo json_encode(['error' => 'Your request had been resubmitted.']);
+            //redirect to index after 5 seconds
+          
             return;
         }
 
@@ -64,21 +86,51 @@ class SignupController extends BaseController
     {
         $conn = Database::getInstance()->getConnection();
         
-        $stmt = $conn->prepare("INSERT INTO HomeOwnerRequests(email, first_name, last_name, password, created_at, approval_status, rejection_message) 
-                               VALUES (?, ?, ?, ?, NOW(), 'pending', NULL)");
+        // Check if request already exists
+        $existingRequest = HomeOwnerRequest::getByEmail($email);
+
         
-        $success = $stmt->execute([
-            $email,
-            $first_name,
-            $last_name,
-            password_hash($password, PASSWORD_DEFAULT)
-        ]);
+
+        $existingUser = User::getByEmail($email);
+        
+        if ($existingUser) {
+            http_response_code(409); // Conflict
+            header('Content-Type: application/json');
+            echo json_encode(['error' => 'Email already exists. Please choose another one.']);
+            return;
+        }
+
+        if ($existingRequest) {
+            // Update existing request to pending status
+            $stmt = $conn->prepare("UPDATE HomeOwnerRequests SET approval_status = 'pending', 
+                                  first_name = ?, last_name = ?, password = ?, 
+                                  created_at = NOW(), rejection_message = NULL 
+                                  WHERE email = ?");
+            
+            $success = $stmt->execute([
+                $first_name,
+                $last_name,
+                password_hash($password, PASSWORD_DEFAULT),
+                $email
+            ]);
+        } else {
+            // Create new request
+            $stmt = $conn->prepare("INSERT INTO HomeOwnerRequests(email, first_name, last_name, 
+                                  password, created_at, approval_status, rejection_message) 
+                                  VALUES (?, ?, ?, ?, NOW(), 'pending', NULL)");
+            
+            $success = $stmt->execute([
+                $email,
+                $first_name,
+                $last_name,
+                password_hash($password, PASSWORD_DEFAULT)
+            ]);
+        }
 
         if ($success) {
             http_response_code(200);
             echo json_encode([
                 'message' => 'Request submitted successfully'
-                
             ]);
         } else {
             http_response_code(500);
