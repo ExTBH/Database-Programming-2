@@ -105,26 +105,64 @@ class HomeOwnerRequest
                 return false;
             }
 
+            // Create new user with specific column order
+            $orderedData = [
+                'user_id' => null,
+                'email' => $row['email'],
+                'password' => $row['password'],
+                'first_name' => $row['first_name'],
+                'last_name' => $row['last_name'],
+                'role' => 'homeowner',
+                'suspended' => 0
+            ];
+
+            error_log("Ordered Data: " . print_r($orderedData, true));
+
+            $columns = implode(', ', array_keys($orderedData));
+            $values = implode(', ', array_fill(0, count($orderedData), '?'));
+
+            // Insert into users table
+            $stmt = $conn->prepare("INSERT INTO users ($columns) VALUES ($values)");
+            $stmt->execute(array_values($orderedData));
+
+            // Delete from HomeOwnerRequests table
+            $stmt = $conn->prepare("DELETE FROM HomeOwnerRequests WHERE id = ?");
+            $stmt->execute([$id]);
+
+
             // Update request status to approved
             $stmt = $conn->prepare("UPDATE HomeOwnerRequests SET approval_status = ? WHERE id = ?");
             $stmt->execute([ApprovalStatus::APPROVED->value, $id]);
 
-            // Remove id from row before insertion
-            unset($row['id']);
-            unset($row['approval_status']);
-            unset($row['rejection_message']);
-            unset($row['created_at']);
-            $row['role'] = 'homeowner';
+            
 
-            // Create new user entry
-            $columns = implode(', ', array_keys($row));
-            $values = implode(', ', array_fill(0, count($row), '?'));
-            $stmt = $conn->prepare("INSERT INTO Users ($columns) VALUES ($values)");
-            $stmt->execute(array_values($row));
+            // Create new user with specific column order
+            $orderedData = [
+                'user_id' => null,
+                'email' => $row['email'],
+                'password' => $row['password'],
+                'first_name' => $row['first_name'],
+                'last_name' => $row['last_name'],
+                'role' => 'homeowner',
+                'suspended' => 0
+            ];
+
+            error_log("Ordered Data: " . print_r($orderedData, true));
+
+            $columns = implode(', ', array_keys($orderedData));
+            $values = implode(', ', array_fill(0, count($orderedData), '?'));
+
+            // Log the query and values for debugging
+            error_log("INSERT INTO users ($columns) VALUES ($values)");
+            error_log("Values: " . print_r(array_values($orderedData), true));
+            
+            $stmt = $conn->prepare("INSERT INTO users ($columns) VALUES ($values)");
+            $stmt->execute(array_values($orderedData));
 
             $conn->commit();
             return true;
         } catch (PDOException $e) {
+            error_log("Error approving request: " . $e->getMessage());
             $conn->rollBack();
             return false;
         }

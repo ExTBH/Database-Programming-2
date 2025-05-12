@@ -226,13 +226,14 @@ $requests = HomeOwnerRequest::getAll();
                     });
 
                     const data = await response.json();
-                    console.log(data);
 
                     if (data.success) {
-                        alert('Request approved successfully!');
-                        // Optionally, remove the row or update the UI
-                        const row = document.querySelector(`[data-row-id="${requestId}"]`).closest('tr');
-                        if (row) row.remove();
+                        // Close the modal
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('approveModal'));
+                        modal.hide();
+                        
+                        // Refresh the page to update the table
+                        window.location.reload();
                     } else {
                         alert(data.message || 'An error occurred while approving the request.');
                     }
