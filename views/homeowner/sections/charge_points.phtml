@@ -78,12 +78,13 @@ $AllChargePoints = ChargePoint::getAll();
                     </button>
                 </td>
             </tr>
+
             <!-- Edit Charge Point Modal -->
 <div class="modal fade" id="editChargePointModal-<?= $ChargePoint->charge_point_id ?>" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form class="editChargePointForm" method="post" action="<?=PREFIX?>/admin.php" enctype="multipart/form-data">
-                <input type="hidden" name="form_id" value="editChargePointForm">
+            <form class="editChargePointFormAdmin" method="post" action="<?=PREFIX?>/admin.php" enctype="multipart/form-data">
+                <input type="hidden" name="form_id" value="editChargePointFormAdmin">
                 <input type="hidden" name="charge_point_id" value="<?= $ChargePoint->charge_point_id ?>">
                 <div class="modal-header">
                     <h5 class="modal-title">Edit Charge Point #<?= $ChargePoint->charge_point_id ?></h5>
@@ -300,7 +301,7 @@ $AllChargePoints = ChargePoint::getAll();
     });
 });
 
-document.querySelectorAll('.editChargePointForm').forEach(form => {
+document.querySelectorAll('.editChargePointFormAdmin').forEach(form => {
     form.addEventListener('submit', async function (e) {
         e.preventDefault();
 
