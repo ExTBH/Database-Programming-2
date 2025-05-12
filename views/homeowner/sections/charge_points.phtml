@@ -321,9 +321,10 @@ document.querySelectorAll('.editChargePointForm').forEach(form => {
             if (data.success) {
                 alert(data.message);
                 // Optionally close the modal or reset the form
-                const modal = bootstrap.Modal.getInstance(document.getElementById('editChargePointModal-' + data.charge_point_id));
-                modal.hide();
-                form.reset();
+                const modal = bootstrap.Modal.getInstance(form.closest('.modal'));
+        if (modal) {
+            modal.hide();
+        }
                 window.location.reload();  // Reload the page if the action is successful
             } else {
                 alert(data.message || 'An error occurred while updating the charge point.');
