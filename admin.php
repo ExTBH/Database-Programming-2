@@ -256,6 +256,27 @@ case 'addChargePointForm':
         }
         exit;
     
+    case 'deleteChargePoint':
+        $chargePointId = $_POST['charge_point_id'] ?? null;
+
+        if (!$chargePointId) {
+            echo json_encode(['success' => false, 'message' => 'Charge Point ID is required.']);
+            exit;
+        }
+
+        try {
+            // Call the delete method in the ChargePoint model
+            $success = ChargePoint::deleteChargePoint((int)$chargePointId);
+
+            if ($success) {
+                echo json_encode(['success' => true, 'message' => 'Charge point deleted successfully.']);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Failed to delete charge point.']);
+            }
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+        }
+        exit;
 
 case 'validateHomeownerEmail':
     $email = $_POST['email'] ?? null;
