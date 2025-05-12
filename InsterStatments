@@ -1,2 +1,14 @@
 --already in the db file
 -- add extra here if needed
+
+-- Booking 1: rob books Lee’s charge point
+INSERT INTO bookings (charge_point_id, user_id, start_time, end_time, status, booking_price)
+VALUES (1, 1, '2025-05-12 09:00:00', '2025-05-12 10:30:00', 'approved', 15.00);
+
+-- Booking 2: sue books Lee’s charge point
+INSERT INTO bookings (charge_point_id, user_id, start_time, end_time, status, booking_price)
+VALUES (1, 3, '2025-05-13 14:00:00', '2025-05-13 16:00:00', 'pending', 20.00);
+
+-- Booking 3: rob cancels another future booking
+INSERT INTO bookings (charge_point_id, user_id, start_time, end_time, status, booking_price)
+VALUES (1, 1, '2025-05-14 18:00:00', '2025-05-14 19:30:00', 'cancelled', 0.00);

@@ -351,6 +351,24 @@ case 'validateHomeownerEmail':
         echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
     }
     exit;
+
+    case 'updateBookingStatus':
+        $bookingId = $_POST['booking_id'] ?? null;
+        $newStatus = $_POST['status'] ?? null; // 'approved' or 'denied'
+    
+        if (!$bookingId || !in_array($newStatus, ['approved', 'denied'])) {
+            echo json_encode(['success' => false, 'message' => 'Invalid data provided.']);
+            exit;
+        }
+    
+        try {
+            Booking::updateStatus($bookingId, $newStatus);
+            echo json_encode(['success' => true, 'message' => 'Booking status updated successfully.']);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+        }
+        exit;
+    
                                
             default:
                 $response['message'] = "Unknown form submission.";
@@ -388,6 +406,7 @@ case 'validateHomeownerEmail':
         exit;
     }
 
+    
     
 
     // fallback: full page reload
