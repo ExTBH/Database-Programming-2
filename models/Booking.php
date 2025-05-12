@@ -167,4 +167,11 @@ class Booking
 
         return $row ? (int)$row['completed_count'] : 0;
     }
+    public static function updateStatus($bookingId, $status)
+    {
+        $conn = Database::getInstance()->getConnection();
+        $stmt = $conn->prepare("UPDATE bookings SET status = ? WHERE booking_id = ?");
+        $stmt->execute([$status, $bookingId]);
+    }
+    
 }
