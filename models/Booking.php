@@ -169,9 +169,20 @@ class Booking
     }
     public static function updateStatus($bookingId, $status)
     {
-        $conn = Database::getInstance()->getConnection();
-        $stmt = $conn->prepare("UPDATE bookings SET status = ? WHERE booking_id = ?");
-        $stmt->execute([$status, $bookingId]);
+        try {
+            // Get the PDO connection
+            $conn = Database::getInstance()->getConnection();
+    
+            $stmt = $conn->prepare("UPDATE bookings SET status = ? WHERE booking_id = ?");
+            $stmt->execute([$status, $bookingId]);
+            
+            if ($stmt->rowCount() === 0) {
+                throw new Exception("Booking not found or status not updated.");
+            }
+        } catch (PDOException $e) {
+            // Handle database errors
+            throw new Exception("Database error: " . $e->getMessage());
+        }
     }
     
 }
