@@ -70,7 +70,7 @@ $AllChargePoints = ChargePoint::getAll();
                     </span>
                 </td>
                 <td>
-                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editChargePointModal-<?= $ChargePoint->id ?>">
+                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editChargePointModal-<?= $ChargePoint->charge_point_id ?>">
                         <i class="fa-solid fa-edit"></i>
                     </button>
                     <button class="btn btn-danger btn-sm delete-charge-point" data-charge-point-id="<?= $ChargePoint->charge_point_id ?>">
@@ -99,6 +99,7 @@ $AllChargePoints = ChargePoint::getAll();
         <div class="mb-3">
             <label class="form-label">Location Address</label>
             <input type="text" name="location" class="form-control" required>
+            <div class="invalid-feedback">Please provide a location address.</div>
         </div>
         <div class="mb-3">
             <label class="form-label">Postcode</label>
@@ -173,41 +174,77 @@ $AllChargePoints = ChargePoint::getAll();
    document.getElementById('addChargePointForm').addEventListener('submit', async function (e) {
     e.preventDefault();
 
+    // Validate required fields
+    const requiredFields = this.querySelectorAll('[required]');
+    let isValid = true;
+
+    requiredFields.forEach(field => {
+        if (!field.value.trim()) {
+            field.classList.add('is-invalid');
+            isValid = false;
+        } else {
+            field.classList.remove('is-invalid');
+        }
+    });
+
+    // Validate the image field
+    const imageField = this.querySelector('[name="image"]');
+    if (imageField && !imageField.files.length) {
+        imageField.classList.add('is-invalid');
+        isValid = false;
+    } else {
+        imageField.classList.remove('is-invalid');
+    }
+
+    // Validate the checkbox
+    const checkboxField = this.querySelector('[name="is_available"]');
+    if (checkboxField && !checkboxField.checked) {
+        checkboxField.classList.add('is-invalid');
+        isValid = false;
+    } else {
+        checkboxField.classList.remove('is-invalid');
+    }
+
+    if (!isValid) {
+        alert('Please fill in all required fields, attach an image, and check the availability box.');
+        return;
+    }
+
     const formData = new FormData(this);
     console.log([...formData.entries()]); // Log form data to ensure all fields are being sent
 
     try {
-    console.log('Submitting form...'); // Log when the form is being submitted
-    const response = await fetch(this.action, {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
+        console.log('Submitting form...'); // Log when the form is being submitted
+        const response = await fetch(this.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+
+        // Await the response text to log it
+        const responseText = await response.text();
+        console.log('Response received:', responseText); // Log the raw response text
+
+        // Parse the response as JSON
+        const data = JSON.parse(responseText);
+
+        console.log(data); // Log the parsed JSON data
+
+        if (data.success) {
+            alert(data.message);
+            const modal = bootstrap.Modal.getInstance(document.getElementById('addChargePointModal'));
+            modal.hide();
+            this.reset();
+            window.location.reload();
+        } else {
+            alert(data.message || 'An error occurred while adding the charge point.');
         }
-    });
-
-    // Await the response text to log it
-    const responseText = await response.text();
-    console.log('Response received:', responseText); // Log the raw response text
-
-    // Parse the response as JSON
-    const data = JSON.parse(responseText);
-
-    console.log(data); // Log the parsed JSON data
-
-    if (data.success) {
-        alert(data.message);
-        const modal = bootstrap.Modal.getInstance(document.getElementById('addChargePointModal'));
-        modal.hide();
-        this.reset();
-        window.location.reload();
-    } else {
-        alert(data.message || 'An error occurred while adding the charge point.');
+    } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred while submitting the form.');
     }
-} catch (error) {
-    console.error('Error:', error);
-    alert('An error occurred while submitting the form.');
-}
 });
 
 document.querySelector('[name="homeowner_email"]').addEventListener('blur', async function () {
