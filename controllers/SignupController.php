@@ -95,25 +95,38 @@ class SignupController extends BaseController
         
         if ($existingUser) {
             http_response_code(409); // Conflict
-            header('Content-Type: application/json');
+            header(header: 'Content-Type: application/json');
             echo json_encode(['error' => 'Email already exists. Please choose another one.']);
             return;
         }
 
-        if ($existingRequest) {
+        if ($existingRequest && $existingRequest->approval_status->value == 'rejected') {
             // Update existing request to pending status
             $stmt = $conn->prepare("UPDATE HomeOwnerRequests SET approval_status = 'pending', 
                                   first_name = ?, last_name = ?, password = ?, 
                                   created_at = NOW(), rejection_message = NULL 
                                   WHERE email = ?");
-            
+
             $success = $stmt->execute([
                 $first_name,
                 $last_name,
                 password_hash($password, PASSWORD_DEFAULT),
                 $email
             ]);
-        } else {
+
+              if ($success) {
+                                    http_response_code(409); // Conflict
+            header('Content-Type: application/json');
+            echo json_encode(['error' => 'Your request had been resubmitted.']);
+            return;
+                                }
+        } else if($existingRequest && $existingRequest->approval_status->value == 'pending') {
+            http_response_code(409); // Conflict
+            header('Content-Type: application/json');
+            echo json_encode(['error' => 'Email already exists in the request list. Please wait for approval.']);
+            return;
+
+        }else {
             // Create new request
             $stmt = $conn->prepare("INSERT INTO HomeOwnerRequests(email, first_name, last_name, 
                                   password, created_at, approval_status, rejection_message) 
