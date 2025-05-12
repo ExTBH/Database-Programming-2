@@ -263,6 +263,29 @@ case 'validateHomeownerEmail':
         echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
     }
     exit;
+
+    case 'rejectRequest':
+    $requestId = $_POST['request_id'] ?? null;
+    $rejectionMessage = $_POST['rejection_message'] ?? null;
+
+    if (!$requestId || !$rejectionMessage) {
+        echo json_encode(['success' => false, 'message' => 'Request ID and rejection message are required.']);
+        exit;
+    }
+
+    try {
+        // Update the rejection status and message in the database
+        $success = HomeOwnerRequest::rejectRequest((int)$requestId, $rejectionMessage);
+
+        if ($success) {
+            echo json_encode(['success' => true, 'message' => 'Request rejected successfully.']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to reject the request.']);
+        }
+    } catch (Exception $e) {
+        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+    }
+    exit;
                                
             default:
                 $response['message'] = "Unknown form submission.";

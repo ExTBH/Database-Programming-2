@@ -244,4 +244,18 @@ $requests = HomeOwnerRequest::getAll();
             });
         });
     });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const rejectModal = document.getElementById('rejectModal');
+        if (rejectModal) {
+            rejectModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const requestId = button.getAttribute('data-request-id');
+                const name = button.getAttribute('data-name');
+
+                document.getElementById('reject_request_id').value = requestId;
+                document.getElementById('reject_name').textContent = name;
+            });
+        }
+    });
 </script>
