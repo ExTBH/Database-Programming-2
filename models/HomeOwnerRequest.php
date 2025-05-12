@@ -90,81 +90,67 @@ class HomeOwnerRequest
     }
 
     public static function approveRequest(int $id): bool
-    {
-        $conn = Database::getInstance()->getConnection();
-        
-        try {
-            $conn->beginTransaction();
+{
+    $conn = Database::getInstance()->getConnection();
+    
+    try {
+        $conn->beginTransaction();
 
-            // Get the request by ID
-            $stmt = $conn->prepare("SELECT * FROM HomeOwnerRequests WHERE id = ?");
-            $stmt->execute([$id]);
-            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        // Get the request by ID
+        $stmt = $conn->prepare("SELECT * FROM HomeOwnerRequests WHERE id = ?");
+        $stmt->execute([$id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            if (!$row) {
-                return false;
-            }
-
-            // Create new user with specific column order
-            $orderedData = [
-                'user_id' => null,
-                'email' => $row['email'],
-                'password' => $row['password'],
-                'first_name' => $row['first_name'],
-                'last_name' => $row['last_name'],
-                'role' => 'homeowner',
-                'suspended' => 0
-            ];
-
-            error_log("Ordered Data: " . print_r($orderedData, true));
-
-            $columns = implode(', ', array_keys($orderedData));
-            $values = implode(', ', array_fill(0, count($orderedData), '?'));
-
-            // Insert into users table
-            $stmt = $conn->prepare("INSERT INTO users ($columns) VALUES ($values)");
-            $stmt->execute(array_values($orderedData));
-
-            // Delete from HomeOwnerRequests table
-            $stmt = $conn->prepare("DELETE FROM HomeOwnerRequests WHERE id = ?");
-            $stmt->execute([$id]);
-
-
-            // Update request status to approved
-            $stmt = $conn->prepare("UPDATE HomeOwnerRequests SET approval_status = ? WHERE id = ?");
-            $stmt->execute([ApprovalStatus::APPROVED->value, $id]);
-
-            
-
-            // Create new user with specific column order
-            $orderedData = [
-                'user_id' => null,
-                'email' => $row['email'],
-                'password' => $row['password'],
-                'first_name' => $row['first_name'],
-                'last_name' => $row['last_name'],
-                'role' => 'homeowner',
-                'suspended' => 0
-            ];
-
-            error_log("Ordered Data: " . print_r($orderedData, true));
-
-            $columns = implode(', ', array_keys($orderedData));
-            $values = implode(', ', array_fill(0, count($orderedData), '?'));
-
-            // Log the query and values for debugging
-            error_log("INSERT INTO users ($columns) VALUES ($values)");
-            error_log("Values: " . print_r(array_values($orderedData), true));
-            
-            $stmt = $conn->prepare("INSERT INTO users ($columns) VALUES ($values)");
-            $stmt->execute(array_values($orderedData));
-
-            $conn->commit();
-            return true;
-        } catch (PDOException $e) {
-            error_log("Error approving request: " . $e->getMessage());
-            $conn->rollBack();
+        if (!$row) {
             return false;
         }
+
+        // Update request status to approved
+        $stmt = $conn->prepare("UPDATE HomeOwnerRequests SET approval_status = ? WHERE id = ?");
+        $stmt->execute([ApprovalStatus::APPROVED->value, $id]);
+
+        // Create new user with specific column order
+        $orderedData = [
+            'user_id' => null,
+            'email' => $row['email'],
+            'password' => $row['password'],
+            'first_name' => $row['first_name'],
+            'last_name' => $row['last_name'],
+            'role' => 'homeowner',
+            'suspended' => 0
+        ];
+
+        error_log("Ordered Data: " . print_r($orderedData, true));
+
+        $columns = implode(', ', array_keys($orderedData));
+        $values = implode(', ', array_fill(0, count($orderedData), '?'));
+
+        error_log("INSERT INTO users ($columns) VALUES ($values)");
+        error_log("Values: " . print_r(array_values($orderedData), true));
+        
+        $stmt = $conn->prepare("INSERT INTO users ($columns) VALUES ($values)");
+        $stmt->execute(array_values($orderedData));
+
+        // Delete the request from HomeOwnerRequests
+        $stmt = $conn->prepare("DELETE FROM HomeOwnerRequests WHERE id = ?");
+        $stmt->execute([$id]);
+
+        $conn->commit();
+        return true;
+    } catch (PDOException $e) {
+        error_log("Error approving request: " . $e->getMessage());
+        $conn->rollBack();
+        return false;
     }
+}
+
+    public static function rejectRequest(int $id, string $message): bool
+    {
+        $conn = Database::getInstance()->getConnection();
+        $stmt = $conn->prepare("UPDATE HomeOwnerRequests SET approval_status = ?, rejection_message = ? WHERE id = ?");
+        return $stmt->execute([ApprovalStatus::REJECTED->value, $message, $id]);
+    }
+
+  
+
 }
