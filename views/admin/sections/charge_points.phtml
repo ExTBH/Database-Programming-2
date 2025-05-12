@@ -26,9 +26,8 @@ $AllChargePoints = ChargePoint::getAll();
     <div class="col-md-3">
         <select class="form-select" id="statusFilter">
             <option value="">All Statuses</option>
-            <option value="available">Available</option>
-            <option value="in-use">In Use</option>
-            <option value="maintenance">Maintenance</option>
+            <option value="1">Available</option>
+            <option value="0">Unavailable</option>
         </select>
     </div>
 </div>
@@ -159,13 +158,16 @@ $AllChargePoints = ChargePoint::getAll();
         });
     });
 
-    document.getElementById('statusFilter').addEventListener('change', function() {
-        const selectedStatus = this.value.toLowerCase();
+    document.getElementById('statusFilter').addEventListener('change', function () {
+        const selectedStatus = this.value; // Get the selected value (1 or 0)
         const tableRows = document.querySelectorAll('table tbody tr');
-        
+
         tableRows.forEach(row => {
-            const status = row.querySelector('td:nth-child(5) span').textContent.toLowerCase();
-            if (selectedStatus === '' || status === selectedStatus) {
+            const statusBadge = row.querySelector('td:nth-child(5) span'); // Get the status badge
+            const isAvailable = statusBadge.textContent.trim().toLowerCase() === 'available' ? '1' : '0';
+
+            // Show or hide the row based on the selected status
+            if (selectedStatus === '' || selectedStatus === isAvailable) {
                 row.style.display = '';
             } else {
                 row.style.display = 'none';
