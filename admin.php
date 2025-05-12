@@ -198,19 +198,60 @@ case 'addChargePointForm':
         echo json_encode(['success' => false, 'message' => 'Failed to add charge point: ' . $e->getMessage()]);
     }
     exit;
-
-    if ($_POST['form_id'] === 'editChargePointForm') {
-        // Validate inputs and process the form
-        $charge_point_id = $_POST['charge_point_id'];
-        $location = $_POST['location']; // Add validation here
-        // Process the edit, update the charge point in the database, and send a response
-        echo json_encode([
-            'success' => true,
-            'message' => 'Charge Point updated successfully.',
-            'charge_point_id' => $charge_point_id
-        ]);
+    
+    case 'editChargePointForm':
+        error_log('editChargePointForm triggered'); // Log when this case is triggered
+    
+        // Validate required fields
+        $chargePointId = $_POST['charge_point_id'] ?? null;
+        $location = $_POST['location'] ?? null;
+        $postcode = $_POST['postcode'] ?? null;
+        $latitude = isset($_POST['latitude']) ? (float)$_POST['latitude'] : null; // Cast to float
+        $longitude = isset($_POST['longitude']) ? (float)$_POST['longitude'] : null; // Cast to float
+        $pricePerKwh = isset($_POST['price_per_kwh']) ? (float)$_POST['price_per_kwh'] : null; // Cast to float
+        $homeownerEmail = $_POST['homeowner_email'] ?? null;
+        $description = $_POST['description'] ?? null;
+        $isAvailable = isset($_POST['is_available']) ? 1 : 0;
+    
+        // Validate that charge_point_id is provided
+        if (!$chargePointId || !$location || !$postcode || !$latitude || !$longitude || !$pricePerKwh || !$homeownerEmail) {
+            error_log('Missing required fields for editing charge point'); // Log missing fields
+            echo json_encode(['success' => false, 'message' => 'All required fields must be filled.']);
+            exit;
+        }
+    
+        // Get homeowner ID
+        $homeowner = user::getByEmail($homeownerEmail);
+        $homeOwnerId = $homeowner->id;
+    
+        // Optionally handle the image if it's provided (for updating)
+        $imageContent = null;
+        if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+            $imageContent = file_get_contents($_FILES['image']['tmp_name']); // Read the raw image content
+        }
+    
+        try {
+            // Update charge point
+            ChargePoint::manageChargePoint(
+                'edit',
+                $chargePointId, // Pass the charge point ID for the edit operation
+                $homeOwnerId, // homeownerId will be resolved in the method
+                $location,
+                $postcode,
+                $latitude,
+                $longitude,
+                $pricePerKwh, // Pass the float value
+                $description,
+                $isAvailable,
+                $imageContent // Pass the raw image content directly if provided
+            );
+    
+            echo json_encode(['success' => true, 'message' => 'Charge point updated successfully.']);
+        } catch (Exception $e) {
+            error_log('Error updating charge point: ' . $e->getMessage()); // Log exceptions
+            echo json_encode(['success' => false, 'message' => 'Failed to update charge point: ' . $e->getMessage()]);
+        }
         exit;
-    }
     
 
 case 'validateHomeownerEmail':
