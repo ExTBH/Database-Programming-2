@@ -81,7 +81,8 @@ $AllChargePoints = ChargePoint::getAll();
                         data-latitude="<?= htmlspecialchars($ChargePoint->latitude ?? '') ?>"
                         data-longitude="<?= htmlspecialchars($ChargePoint->longitude ?? '') ?>"
                         data-price-per-kwh="<?= htmlspecialchars($ChargePoint->price_per_kwh ?? '') ?>"
-                        data-homeowner-email="<?= htmlspecialchars(ChargePoint::getEmailById($ChargePoint->homeowner_id) ?? '') ?>"
+                        data-homeowner-email="<?= htmlspecialchars(User::getById($ChargePoint->homeowner_id)->email ?? '') ?>"
+                        <?php error_log("Charge point email owner : " . User::getById($ChargePoint->homeowner_id)->email); ?>
                         data-description="<?= htmlspecialchars($ChargePoint->description ?? '') ?>"
                         data-is-available="<?= $ChargePoint->is_available ? '1' : '0' ?>">
                         <i class="fa-solid fa-edit"></i>
@@ -427,5 +428,48 @@ document.querySelectorAll('.edit-charge-point').forEach(button => {
         document.getElementById('edit_description').value = description;
         document.getElementById('edit_is_available').checked = isAvailable;
     });
+});
+
+document.getElementById('editChargePointForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const formData = new FormData(this);
+
+    try {
+        const response = await fetch(this.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            alert('Charge point has been edited successfully.');
+
+            // Update the table row dynamically
+            const chargePointId = formData.get('charge_point_id');
+            const row = document.querySelector(`[data-row-id="row-${chargePointId}"]`).closest('tr');
+
+            if (row) {
+                row.querySelector('td:nth-child(2)').textContent = formData.get('location');
+                row.querySelector('td:nth-child(3)').textContent = formData.get('homeowner_email');
+                row.querySelector('td:nth-child(4)').textContent = formData.get('price_per_kwh');
+                row.querySelector('td:nth-child(5) span').textContent = formData.get('is_available') ? 'Available' : 'Not Available';
+                row.querySelector('td:nth-child(5) span').className = formData.get('is_available') ? 'badge bg-success' : 'badge bg-secondary';
+            }
+
+            // Hide the modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editChargePointModal'));
+            modal.hide();
+        } else {
+            alert(data.message || 'Failed to edit charge point.');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred while editing the charge point.');
+    }
 });
 </script>
