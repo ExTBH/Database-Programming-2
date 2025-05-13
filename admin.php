@@ -256,6 +256,27 @@ case 'addChargePointForm':
         }
         exit;
     
+    case 'deleteChargePoint':
+        $chargePointId = $_POST['charge_point_id'] ?? null;
+
+        if (!$chargePointId) {
+            echo json_encode(['success' => false, 'message' => 'Charge Point ID is required.']);
+            exit;
+        }
+
+        try {
+            // Call the delete method in the ChargePoint model
+            $success = ChargePoint::deleteChargePoint((int)$chargePointId);
+
+            if ($success) {
+                echo json_encode(['success' => true, 'message' => 'Charge point deleted successfully.']);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Failed to delete charge point.']);
+            }
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+        }
+        exit;
 
 case 'validateHomeownerEmail':
     $email = $_POST['email'] ?? null;
@@ -347,6 +368,45 @@ case 'validateHomeownerEmail':
             echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
         }
         exit;
+
+        case 'editChargePointFormAdmin':
+    $chargePointId = $_POST['charge_point_id'] ?? null;
+    $location = $_POST['location'] ?? null;
+    $postcode = $_POST['postcode'] ?? null;
+    $latitude = $_POST['latitude'] ?? null;
+    $longitude = $_POST['longitude'] ?? null;
+    $pricePerKwh = $_POST['price_per_kwh'] ?? null;
+    $homeownerEmail = $_POST['homeowner_email'] ?? null;
+    $description = $_POST['description'] ?? null;
+    $isAvailable = isset($_POST['is_available']) ? 1 : 0;
+
+    // Handle image upload
+    $imageContent = null;
+    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+        $imageContent = file_get_contents($_FILES['image']['tmp_name']);
+    }
+
+    try {
+        // Update the charge point in the database
+        ChargePoint::manageChargePoint(
+            'update',
+            $chargePointId,
+            $homeownerEmail,
+            $location,
+            $postcode,
+            $latitude,
+            $longitude,
+            $pricePerKwh,
+            $description,
+            $isAvailable,
+            $imageContent
+        );
+
+        echo json_encode(['success' => true, 'message' => 'Charge point updated successfully.']);
+    } catch (Exception $e) {
+        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+    }
+    exit;
     
                                
             default:

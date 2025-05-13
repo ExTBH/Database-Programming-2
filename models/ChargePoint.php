@@ -130,6 +130,21 @@ class ChargePoint
         return $chargePoints;
     }
 
+    public static function getEmailById(int $charge_point_id): ?string 
+    {
+        $conn = Database::getInstance()->getConnection();
+        $stmt = $conn->prepare("
+            SELECT u.email 
+            FROM charge_points cp
+            JOIN users u ON cp.homeowner_id = u.user_id 
+            WHERE cp.charge_point_id = ?
+        ");
+        $stmt->execute([$charge_point_id]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        return $result ? $result['email'] : null;
+    }
+
     public static function manageChargePoint(
         string $action,
         ?int $chargePointId = null,
