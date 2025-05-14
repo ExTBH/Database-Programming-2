@@ -355,9 +355,9 @@ case 'validateHomeownerEmail':
 
     case 'updateBookingStatus':
         $bookingId = $_POST['booking_id'] ?? null;
-        $newStatus = $_POST['status'] ?? null; // 'approved' or 'denied'
+        $newStatus = $_POST['status'] ?? null; // 'approved' or 'declined'
     
-        if (!$bookingId || !in_array($newStatus, ['approved', 'denied'])) {
+        if (!$bookingId || !in_array($newStatus, ['approved', 'declined'])) {
             echo json_encode(['success' => false, 'message' => 'Invalid data provided.']);
             exit;
         }

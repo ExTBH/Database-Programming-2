@@ -44,7 +44,7 @@ $bookings = Booking::getAllForHomeOwnerId($user->id);
                             case 'approved':
                                 $statusClass = 'bg-success';
                                 break;
-                            case 'denied':
+                            case 'declined':
                                 $statusClass = 'bg-danger';
                                 break;
                             case 'pending':
@@ -104,7 +104,7 @@ $bookings = Booking::getAllForHomeOwnerId($user->id);
         document.querySelectorAll('.deny-btn').forEach(button => {
             button.addEventListener('click', function () {
                 const bookingId = this.dataset.id;
-                updateBookingStatus(bookingId, 'denied');
+                updateBookingStatus(bookingId, 'declined');
             });
         });
 
