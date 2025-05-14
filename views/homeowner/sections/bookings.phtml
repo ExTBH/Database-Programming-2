@@ -13,6 +13,8 @@ $bookings = Booking::getAllForHomeOwnerId($user->id);
 </div>
 
 <!-- Bookings Table -->
+
+
 <div class="table-responsive">
     <table class="table table-bordered">
         <thead class="table-light">
@@ -38,13 +40,21 @@ $bookings = Booking::getAllForHomeOwnerId($user->id);
                     <td><?= $booking->end_time->format('Y-m-d H:i') ?></td>
                     <td>
                         <?php
-                        $statusClass = match ($booking->status->value) {
-                            'approved' => 'bg-success',
-                            'denied' => 'bg-danger',
-                            'pending' => 'bg-warning',
-                            default => 'bg-secondary'
-                        };
+                        switch ($booking->status->value) {
+                            case 'approved':
+                                $statusClass = 'bg-success';
+                                break;
+                            case 'denied':
+                                $statusClass = 'bg-danger';
+                                break;
+                            case 'pending':
+                                $statusClass = 'bg-warning';
+                                break;
+                            default:
+                                $statusClass = 'bg-secondary';
+                        }
                         ?>
+
                         <span class="badge <?= $statusClass ?>">
                             <?= ucfirst(htmlspecialchars($booking->status->value)) ?>
                         </span>
@@ -100,7 +110,7 @@ $bookings = Booking::getAllForHomeOwnerId($user->id);
 
         // Function to handle status update via AJAX
         function updateBookingStatus(bookingId, status) {
-            fetch('admin.php', {
+            fetch('<?= PREFIX ?>/admin.php', {
                 method: 'POST',
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
