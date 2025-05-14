@@ -2,8 +2,9 @@
 
 require_once __DIR__ . '/../../../models/ChargePoint.php';
 
-$AllChargePoints = ChargePoint::getAll();
-
+//$AllChargePoints = ChargePoint::getAll();
+$User = User::fromSession();
+$AllChargePoints = ChargePoint::getByHomeownerId($User->id);
 
 ?>
 <div class="d-flex justify-content-between align-items-center mb-4">
