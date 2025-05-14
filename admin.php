@@ -5,6 +5,7 @@ require_once 'controllers/AdminController.php';
 require_once 'models/User.php';
 require_once 'models/ChargePoint.php';
 require_once 'models/HomeOwnerRequest.php';
+require_once 'models/Booking.php';
 
 session_start();
 
