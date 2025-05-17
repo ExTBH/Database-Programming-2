@@ -24,7 +24,6 @@ $bookings = Booking::getAllForHomeOwnerId($user->id);
                 <th>Start Time</th>
                 <th>End Time</th>
                 <th>Status</th>
-                <th>Total Price</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -59,7 +58,6 @@ $bookings = Booking::getAllForHomeOwnerId($user->id);
                             <?= ucfirst(htmlspecialchars($booking->status->value)) ?>
                         </span>
                     </td>
-                    <td>BHD <?= number_format($booking->total_price ?? 0, 3) ?></td>
                     <td>
                         <div class="btn-group btn-group-sm">
                             <?php if ($booking->status === BookingStatus::Pending): ?>
@@ -91,10 +89,10 @@ $bookings = Booking::getAllForHomeOwnerId($user->id);
 
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
         // Approve button click
         document.querySelectorAll('.approve-btn').forEach(button => {
-            button.addEventListener('click', function () {
+            button.addEventListener('click', function() {
                 const bookingId = this.dataset.id;
                 updateBookingStatus(bookingId, 'approved');
             });
@@ -102,7 +100,7 @@ $bookings = Booking::getAllForHomeOwnerId($user->id);
 
         // Deny button click
         document.querySelectorAll('.deny-btn').forEach(button => {
-            button.addEventListener('click', function () {
+            button.addEventListener('click', function() {
                 const bookingId = this.dataset.id;
                 updateBookingStatus(bookingId, 'declined');
             });
@@ -111,31 +109,31 @@ $bookings = Booking::getAllForHomeOwnerId($user->id);
         // Function to handle status update via AJAX
         function updateBookingStatus(bookingId, status) {
             fetch('<?= PREFIX ?>/admin.php', {
-                method: 'POST',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `form_id=updateBookingStatus&booking_id=${bookingId}&status=${status}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert(data.message);
-                    const row = document.querySelector(`button[data-id='${bookingId}']`).closest('tr');
-                    const statusBadge = row.querySelector('.badge');
-                    statusBadge.className = `badge bg-${status}`;
-                    statusBadge.textContent = ucfirst(status);
-                    row.querySelector('.btn-group').innerHTML = `
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `form_id=updateBookingStatus&booking_id=${bookingId}&status=${status}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        const row = document.querySelector(`button[data-id='${bookingId}']`).closest('tr');
+                        const statusBadge = row.querySelector('.badge');
+                        statusBadge.className = `badge bg-${status}`;
+                        statusBadge.textContent = ucfirst(status);
+                        row.querySelector('.btn-group').innerHTML = `
                         <button type="button" class="btn btn-outline-secondary" disabled>
                             <i class="fa-solid fa-lock"></i>
                         </button>
                     `;
-                } else {
-                    alert(data.message);
-                }
-            })
-            .catch(error => alert('Error: ' + error));
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => alert('Error: ' + error));
         }
 
         // Capitalize the first letter of the string (helper function)
