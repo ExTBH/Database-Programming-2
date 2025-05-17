@@ -10,13 +10,14 @@
                     <th>End Time</th>
                     <th>Status</th>
                     <th>Price per kWh</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody id="bookings-table-body">
                 <!-- Dynamically populated -->
 
                 <tr id="loading-row">
-                    <td colspan="5" class="text-center">
+                    <td colspan="6" class="text-center">
                         <div class="spinner-border text-primary" role="status" style="width: 2rem; height: 2rem;">
                             <span class="visually-hidden">Loading...</span>
                         </div>
@@ -45,6 +46,13 @@
                             </span>
                         </td>
                         <td>BHD ${booking.price_per_kwh.toFixed(3)}</td>
+                        <td>
+                            <a href="<?= PREFIX ?>/contact.php?homeowner=${booking.homeowner_id}" 
+                               class="btn btn-outline-success btn-sm d-inline-flex align-items-center gap-1">
+                                <i class="fa-solid fa-comment"></i>
+                                Contact Owner
+                            </a>
+                        </td>
                     </tr>
                 `).join('');
             })
