@@ -1,8 +1,8 @@
 <?php
 
 require_once __DIR__ . '/../../../models/ChargePoint.php';
+require_once __DIR__ . '/../../../models/User.php';
 
-//$AllChargePoints = ChargePoint::getAll();
 
 $user = User::fromSession();
 $AllChargePoints = ChargePoint::getByHomeownerId($user->id);
