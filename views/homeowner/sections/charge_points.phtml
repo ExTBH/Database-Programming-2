@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 require_once __DIR__ . '/../../../models/ChargePoint.php';
 
@@ -54,50 +54,50 @@ $AllChargePoints = ChargePoint::getByHomeownerId($user->id);
         </thead>
         <tbody>
 
-        <?php foreach ($AllChargePoints as $ChargePoint): ?>
+            <?php foreach ($AllChargePoints as $ChargePoint): ?>
 
-            <tr>
-                <td>#<?= htmlspecialchars($ChargePoint->charge_point_id) ?></td>
-                <td><?= htmlspecialchars($ChargePoint-> address) ?></td>
-                <?php 
-                $homeowner = ChargePoint::getHomeownerByChargePointId($ChargePoint->charge_point_id); 
-                ?>
-                <td>
-                <?php if ($homeowner): ?>
-                <?= htmlspecialchars($homeowner['first_name'] . ' ' . $homeowner['last_name']) ?>
-                <?php else: ?>
-                <span class="text-muted">No Owner</span>
-                <?php endif; ?>
-                </td>              
-                <td><?= htmlspecialchars($ChargePoint->price_per_kwh) ?></td>
-                <td>
-                    <span class="badge <?= $ChargePoint->is_available ? 'bg-success' : 'bg-secondary' ?>">
-                        <?= $ChargePoint->is_available ? 'Available' : 'Not Available' ?>
-                    </span>
-                </td>
-                <td>
-                    <button class="btn btn-primary btn-sm edit-charge-point" 
-                        data-bs-toggle="modal" 
-                        data-bs-target="#editChargePointModal"
-                        data-charge-point-id="<?= htmlspecialchars($ChargePoint->charge_point_id ?? '') ?>"
-                        data-location="<?= htmlspecialchars($ChargePoint->address ?? '') ?>"
-                        data-postcode="<?= htmlspecialchars($ChargePoint->postcode ?? '') ?>"
-                        data-latitude="<?= htmlspecialchars($ChargePoint->latitude ?? '') ?>"
-                        data-longitude="<?= htmlspecialchars($ChargePoint->longitude ?? '') ?>"
-                        data-price-per-kwh="<?= htmlspecialchars($ChargePoint->price_per_kwh ?? '') ?>"
-                        data-homeowner-email="<?= htmlspecialchars(User::getById($ChargePoint->homeowner_id)->email ?? '') ?>"
-                        <?php error_log("Charge point email owner : " . User::getById($ChargePoint->homeowner_id)->email); ?>
-                        data-description="<?= htmlspecialchars($ChargePoint->description ?? '') ?>"
-                        data-is-available="<?= $ChargePoint->is_available ? '1' : '0' ?>">
-                        <i class="fa-solid fa-edit"></i>
-                    </button>
-                    <button class="btn btn-danger btn-sm delete-charge-point" 
-                        data-charge-point-id="<?= $ChargePoint->charge_point_id ?>" 
-                        data-row-id="row-<?= $ChargePoint->charge_point_id ?>">
-                        <i class="fa-solid fa-trash"></i>
+                <tr>
+                    <td>#<?= htmlspecialchars($ChargePoint->charge_point_id) ?></td>
+                    <td><?= htmlspecialchars($ChargePoint->address) ?></td>
+                    <?php
+                    $homeowner = ChargePoint::getHomeownerByChargePointId($ChargePoint->charge_point_id);
+                    ?>
+                    <td>
+                        <?php if ($homeowner): ?>
+                            <?= htmlspecialchars($homeowner['first_name'] . ' ' . $homeowner['last_name']) ?>
+                        <?php else: ?>
+                            <span class="text-muted">No Owner</span>
+                        <?php endif; ?>
+                    </td>
+                    <td><?= htmlspecialchars($ChargePoint->price_per_kwh) ?></td>
+                    <td>
+                        <span class="badge <?= $ChargePoint->is_available ? 'bg-success' : 'bg-secondary' ?>">
+                            <?= $ChargePoint->is_available ? 'Available' : 'Not Available' ?>
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn btn-primary btn-sm edit-charge-point"
+                            data-bs-toggle="modal"
+                            data-bs-target="#editChargePointModal"
+                            data-charge-point-id="<?= htmlspecialchars($ChargePoint->charge_point_id ?? '') ?>"
+                            data-location="<?= htmlspecialchars($ChargePoint->address ?? '') ?>"
+                            data-postcode="<?= htmlspecialchars($ChargePoint->postcode ?? '') ?>"
+                            data-latitude="<?= htmlspecialchars($ChargePoint->latitude ?? '') ?>"
+                            data-longitude="<?= htmlspecialchars($ChargePoint->longitude ?? '') ?>"
+                            data-price-per-kwh="<?= htmlspecialchars($ChargePoint->price_per_kwh ?? '') ?>"
+                            data-homeowner-email="<?= htmlspecialchars(User::getById($ChargePoint->homeowner_id)->email ?? '') ?>"
+                            <?php error_log("Charge point email owner : " . User::getById($ChargePoint->homeowner_id)->email); ?>
+                            data-description="<?= htmlspecialchars($ChargePoint->description ?? '') ?>"
+                            data-is-available="<?= $ChargePoint->is_available ? '1' : '0' ?>">
+                            <i class="fa-solid fa-edit"></i>
                         </button>
-                </td>
-            </tr>
+                        <button class="btn btn-danger btn-sm delete-charge-point"
+                            data-charge-point-id="<?= $ChargePoint->charge_point_id ?>"
+                            data-row-id="row-<?= $ChargePoint->charge_point_id ?>">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
             <?php endforeach; ?>
 
         </tbody>
@@ -168,58 +168,58 @@ $AllChargePoints = ChargePoint::getByHomeownerId($user->id);
 <div class="modal fade" id="addChargePointModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-    
-<form id="addChargePointForm" method="post" action="<?=PREFIX?>/admin.php" enctype="multipart/form-data">
-    <input type="hidden" name="form_id" value="addChargePointForm">
-    <div class="modal-header">
-        <h5 class="modal-title">Add New Charge Point</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-    </div>
-    <div class="modal-body">
-        <div class="mb-3">
-            <label class="form-label">Location Address</label>
-            <input type="text" name="location" class="form-control" required>
-            <div class="invalid-feedback">Please provide a location address.</div>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Postcode</label>
-            <input type="text" name="postcode" class="form-control" required>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Latitude</label>
-            <input type="number" name="latitude" step="0.000001" class="form-control" required>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Longitude</label>
-            <input type="number" name="longitude" step="0.000001" class="form-control" required>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Price per kWh (BHD)</label>
-            <input type="number" name="price_per_kwh" step="0.001" class="form-control" required>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Homeowner Email</label>
-            <input type="email" name="homeowner_email" class="form-control" required>
-            <div class="invalid-feedback">This user does not exist or is not a homeowner.</div>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Description</label>
-            <textarea name="description" class="form-control" rows="3"></textarea>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Attach Image</label>
-            <input type="file" name="image" class="form-control" accept="image/*">
-        </div>
-        <div class="form-check mb-3">
-            <input type="checkbox" name="is_available" class="form-check-input" id="isAvailable">
-            <label class="form-check-label" for="isAvailable">Is Available</label>
-        </div>
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="submit" class="btn btn-success">Add Charge Point</button>
-    </div>
-</form>
+
+            <form id="addChargePointForm" method="post" action="<?= PREFIX ?>/admin.php" enctype="multipart/form-data">
+                <input type="hidden" name="form_id" value="addChargePointForm">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Charge Point</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Location Address</label>
+                        <input type="text" name="location" class="form-control" required>
+                        <div class="invalid-feedback">Please provide a location address.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Postcode</label>
+                        <input type="text" name="postcode" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Latitude</label>
+                        <input type="number" name="latitude" step="0.000001" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Longitude</label>
+                        <input type="number" name="longitude" step="0.000001" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Price per kWh (BHD)</label>
+                        <input type="number" name="price_per_kwh" step="0.001" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Homeowner Email</label>
+                        <input type="email" name="homeowner_email" class="form-control" required>
+                        <div class="invalid-feedback">This user does not exist or is not a homeowner.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea name="description" class="form-control" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Attach Image</label>
+                        <input type="file" name="image" class="form-control" accept="image/*">
+                    </div>
+                    <div class="form-check mb-3">
+                        <input type="checkbox" name="is_available" class="form-check-input" id="isAvailable">
+                        <label class="form-check-label" for="isAvailable">Is Available</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Add Charge Point</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -228,7 +228,7 @@ $AllChargePoints = ChargePoint::getByHomeownerId($user->id);
     document.getElementById('searchChargePoints').addEventListener('input', function() {
         const searchTerm = this.value.toLowerCase();
         const tableRows = document.querySelectorAll('table tbody tr');
-        
+
         tableRows.forEach(row => {
             const location = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
             const owner = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
@@ -237,7 +237,7 @@ $AllChargePoints = ChargePoint::getByHomeownerId($user->id);
         });
     });
 
-    document.getElementById('statusFilter').addEventListener('change', function () {
+    document.getElementById('statusFilter').addEventListener('change', function() {
         const selectedStatus = this.value; // Get the selected value (1 or 0)
         const tableRows = document.querySelectorAll('table tbody tr');
 
@@ -254,226 +254,226 @@ $AllChargePoints = ChargePoint::getByHomeownerId($user->id);
         });
     });
 
-   document.getElementById('addChargePointForm').addEventListener('submit', async function (e) {
-    e.preventDefault();
+    document.getElementById('addChargePointForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
 
-    // Validate required fields
-    const requiredFields = this.querySelectorAll('[required]');
-    let isValid = true;
+        // Validate required fields
+        const requiredFields = this.querySelectorAll('[required]');
+        let isValid = true;
 
-    requiredFields.forEach(field => {
-        if (!field.value.trim()) {
-            field.classList.add('is-invalid');
+        requiredFields.forEach(field => {
+            if (!field.value.trim()) {
+                field.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                field.classList.remove('is-invalid');
+            }
+        });
+
+        // Validate the image field
+        const imageField = this.querySelector('[name="image"]');
+        if (imageField && !imageField.files.length) {
+            imageField.classList.add('is-invalid');
             isValid = false;
         } else {
-            field.classList.remove('is-invalid');
+            imageField.classList.remove('is-invalid');
+        }
+
+        // Validate the checkbox
+        const checkboxField = this.querySelector('[name="is_available"]');
+        if (checkboxField && !checkboxField.checked) {
+            checkboxField.classList.add('is-invalid');
+            isValid = false;
+        } else {
+            checkboxField.classList.remove('is-invalid');
+        }
+
+        if (!isValid) {
+            alert('Please fill in all required fields, attach an image, and check the availability box.');
+            return;
+        }
+
+        const formData = new FormData(this);
+        console.log([...formData.entries()]); // Log form data to ensure all fields are being sent
+
+        try {
+            console.log('Submitting form...'); // Log when the form is being submitted
+            const response = await fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            // Await the response text to log it
+            const responseText = await response.text();
+            console.log('Response received:', responseText); // Log the raw response text
+
+            // Parse the response as JSON
+            const data = JSON.parse(responseText);
+
+            console.log(data); // Log the parsed JSON data
+
+            if (data.success) {
+                alert(data.message);
+                const modal = bootstrap.Modal.getInstance(document.getElementById('addChargePointModal'));
+                modal.hide();
+                this.reset();
+                window.location.reload();
+            } else {
+                alert(data.message || 'An error occurred while adding the charge point.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred while submitting the form.');
         }
     });
 
-    // Validate the image field
-    const imageField = this.querySelector('[name="image"]');
-    if (imageField && !imageField.files.length) {
-        imageField.classList.add('is-invalid');
-        isValid = false;
-    } else {
-        imageField.classList.remove('is-invalid');
-    }
+    document.querySelector('[name="homeowner_email"]').addEventListener('blur', async function() {
+        const emailField = this;
+        const email = emailField.value.trim();
 
-    // Validate the checkbox
-    const checkboxField = this.querySelector('[name="is_available"]');
-    if (checkboxField && !checkboxField.checked) {
-        checkboxField.classList.add('is-invalid');
-        isValid = false;
-    } else {
-        checkboxField.classList.remove('is-invalid');
-    }
-
-    if (!isValid) {
-        alert('Please fill in all required fields, attach an image, and check the availability box.');
-        return;
-    }
-
-    const formData = new FormData(this);
-    console.log([...formData.entries()]); // Log form data to ensure all fields are being sent
-
-    try {
-        console.log('Submitting form...'); // Log when the form is being submitted
-        const response = await fetch(this.action, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        });
-
-        // Await the response text to log it
-        const responseText = await response.text();
-        console.log('Response received:', responseText); // Log the raw response text
-
-        // Parse the response as JSON
-        const data = JSON.parse(responseText);
-
-        console.log(data); // Log the parsed JSON data
-
-        if (data.success) {
-            alert(data.message);
-            const modal = bootstrap.Modal.getInstance(document.getElementById('addChargePointModal'));
-            modal.hide();
-            this.reset();
-            window.location.reload();
-        } else {
-            alert(data.message || 'An error occurred while adding the charge point.');
+        if (!email) {
+            emailField.classList.remove('is-valid', 'is-invalid');
+            return;
         }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('An error occurred while submitting the form.');
-    }
-});
 
-document.querySelector('[name="homeowner_email"]').addEventListener('blur', async function () {
-    const emailField = this;
-    const email = emailField.value.trim();
+        try {
+            const formData = new FormData();
+            formData.append('form_id', 'validateHomeownerEmail');
+            formData.append('email', email);
 
-    if (!email) {
-        emailField.classList.remove('is-valid', 'is-invalid');
-        return;
-    }
+            const response = await fetch('<?= PREFIX ?>/admin.php', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
 
-    try {
-        const formData = new FormData();
-        formData.append('form_id', 'validateHomeownerEmail');
-        formData.append('email', email);
+            const data = await response.json();
 
-        const response = await fetch('<?=PREFIX?>/admin.php', {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
+            if (data.success) {
+                emailField.classList.remove('is-invalid');
+                emailField.classList.add('is-valid');
+                emailField.nextElementSibling.textContent = ''; // Clear error message
+            } else {
+                emailField.classList.remove('is-valid');
+                emailField.classList.add('is-invalid');
+                emailField.nextElementSibling.textContent = data.message; // Show error message
             }
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-            emailField.classList.remove('is-invalid');
-            emailField.classList.add('is-valid');
-            emailField.nextElementSibling.textContent = ''; // Clear error message
-        } else {
+        } catch (error) {
+            console.error('Error validating email:', error);
             emailField.classList.remove('is-valid');
             emailField.classList.add('is-invalid');
-            emailField.nextElementSibling.textContent = data.message; // Show error message
+            emailField.nextElementSibling.textContent = 'An error occurred while validating the email.';
         }
-    } catch (error) {
-        console.error('Error validating email:', error);
-        emailField.classList.remove('is-valid');
-        emailField.classList.add('is-invalid');
-        emailField.nextElementSibling.textContent = 'An error occurred while validating the email.';
-    }
-});
+    });
 
     document.querySelectorAll('.delete-charge-point').forEach(button => {
-    button.addEventListener('click', async function () {
-        const chargePointId = this.getAttribute('data-charge-point-id'); // Get the charge point ID
-        const rowId = this.getAttribute('data-row-id'); // Get the row ID
+        button.addEventListener('click', async function() {
+            const chargePointId = this.getAttribute('data-charge-point-id'); // Get the charge point ID
+            const rowId = this.getAttribute('data-row-id'); // Get the row ID
 
-        if (confirm('Are you sure you want to delete this charge point?')) {
-            try {
-                const formData = new FormData();
-                formData.append('form_id', 'deleteChargePoint');
-                formData.append('charge_point_id', chargePointId);
+            if (confirm('Are you sure you want to delete this charge point?')) {
+                try {
+                    const formData = new FormData();
+                    formData.append('form_id', 'deleteChargePoint');
+                    formData.append('charge_point_id', chargePointId);
 
-                const response = await fetch('<?= PREFIX ?>/admin.php', {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
+                    const response = await fetch('<?= PREFIX ?>/admin.php', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        alert(data.message);
+                        // Remove the row from the table using the row ID
+                        const row = document.querySelector(`[data-row-id="${rowId}"]`).closest('tr');
+                        if (row) row.remove();
+                    } else {
+                        alert(data.message || 'Failed to delete charge point.');
                     }
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    alert(data.message);
-                    // Remove the row from the table using the row ID
-                    const row = document.querySelector(`[data-row-id="${rowId}"]`).closest('tr');
-                    if (row) row.remove();
-                } else {
-                    alert(data.message || 'Failed to delete charge point.');
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('An error occurred while deleting the charge point.');
                 }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('An error occurred while deleting the charge point.');
-            }
-        }
-    });
-});
-
-document.querySelectorAll('.edit-charge-point').forEach(button => {
-    button.addEventListener('click', function () {
-        // Get charge point data from the button's data attributes
-        const chargePointId = this.getAttribute('data-charge-point-id');
-        const location = this.getAttribute('data-location');
-        const postcode = this.getAttribute('data-postcode');
-        const latitude = this.getAttribute('data-latitude');
-        const longitude = this.getAttribute('data-longitude');
-        const pricePerKwh = this.getAttribute('data-price-per-kwh');
-        const homeownerEmail = this.getAttribute('data-homeowner-email');
-        const description = this.getAttribute('data-description');
-        const isAvailable = this.getAttribute('data-is-available') === '1';
-
-        // Populate the modal fields
-        document.getElementById('edit_charge_point_id').value = chargePointId;
-        document.getElementById('edit_location').value = location;
-        document.getElementById('edit_postcode').value = postcode;
-        document.getElementById('edit_latitude').value = latitude;
-        document.getElementById('edit_longitude').value = longitude;
-        document.getElementById('edit_price_per_kwh').value = pricePerKwh;
-        document.getElementById('edit_homeowner_email').value = homeownerEmail;
-        document.getElementById('edit_description').value = description;
-        document.getElementById('edit_is_available').checked = isAvailable;
-    });
-});
-
-document.getElementById('editChargePointForm').addEventListener('submit', async function (e) {
-    e.preventDefault();
-
-    const formData = new FormData(this);
-
-    try {
-        const response = await fetch(this.action, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
             }
         });
+    });
 
-        const data = await response.json();
+    document.querySelectorAll('.edit-charge-point').forEach(button => {
+        button.addEventListener('click', function() {
+            // Get charge point data from the button's data attributes
+            const chargePointId = this.getAttribute('data-charge-point-id');
+            const location = this.getAttribute('data-location');
+            const postcode = this.getAttribute('data-postcode');
+            const latitude = this.getAttribute('data-latitude');
+            const longitude = this.getAttribute('data-longitude');
+            const pricePerKwh = this.getAttribute('data-price-per-kwh');
+            const homeownerEmail = this.getAttribute('data-homeowner-email');
+            const description = this.getAttribute('data-description');
+            const isAvailable = this.getAttribute('data-is-available') === '1';
 
-        if (data.success) {
-            alert('Charge point has been edited successfully.');
+            // Populate the modal fields
+            document.getElementById('edit_charge_point_id').value = chargePointId;
+            document.getElementById('edit_location').value = location;
+            document.getElementById('edit_postcode').value = postcode;
+            document.getElementById('edit_latitude').value = latitude;
+            document.getElementById('edit_longitude').value = longitude;
+            document.getElementById('edit_price_per_kwh').value = pricePerKwh;
+            document.getElementById('edit_homeowner_email').value = homeownerEmail;
+            document.getElementById('edit_description').value = description;
+            document.getElementById('edit_is_available').checked = isAvailable;
+        });
+    });
 
-            // Update the table row dynamically
-            const chargePointId = formData.get('charge_point_id');
-            const row = document.querySelector(`[data-row-id="row-${chargePointId}"]`).closest('tr');
+    document.getElementById('editChargePointForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
 
-            if (row) {
-                row.querySelector('td:nth-child(2)').textContent = formData.get('location');
-                row.querySelector('td:nth-child(3)').textContent = formData.get('homeowner_email');
-                row.querySelector('td:nth-child(4)').textContent = formData.get('price_per_kwh');
-                row.querySelector('td:nth-child(5) span').textContent = formData.get('is_available') ? 'Available' : 'Not Available';
-                row.querySelector('td:nth-child(5) span').className = formData.get('is_available') ? 'badge bg-success' : 'badge bg-secondary';
+        const formData = new FormData(this);
+
+        try {
+            const response = await fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                alert('Charge point has been edited successfully.');
+
+                // Update the table row dynamically
+                const chargePointId = formData.get('charge_point_id');
+                const row = document.querySelector(`[data-row-id="row-${chargePointId}"]`).closest('tr');
+
+                if (row) {
+                    row.querySelector('td:nth-child(2)').textContent = formData.get('location');
+                    row.querySelector('td:nth-child(3)').textContent = formData.get('homeowner_email');
+                    row.querySelector('td:nth-child(4)').textContent = formData.get('price_per_kwh');
+                    row.querySelector('td:nth-child(5) span').textContent = formData.get('is_available') ? 'Available' : 'Not Available';
+                    row.querySelector('td:nth-child(5) span').className = formData.get('is_available') ? 'badge bg-success' : 'badge bg-secondary';
+                }
+
+                // Hide the modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('editChargePointModal'));
+                modal.hide();
+            } else {
+                alert(data.message || 'Failed to edit charge point.');
             }
-
-            // Hide the modal
-            const modal = bootstrap.Modal.getInstance(document.getElementById('editChargePointModal'));
-            modal.hide();
-        } else {
-            alert(data.message || 'Failed to edit charge point.');
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred while editing the charge point.');
         }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('An error occurred while editing the charge point.');
-    }
-});
+    });
 </script>
