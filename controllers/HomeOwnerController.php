@@ -41,12 +41,19 @@ class HomeOwnerController extends BaseController
         $this->activeSection = $_GET['section'] ?? 'charge-points';
 
 
-        $sectionContent = match ($this->activeSection) {
-            'charge-points' => $this->manageChargePoints(),
-            'users' => $this->manageUserAccounts(),
-            'messages' => $this->manageMessages(),
-            default => $this->manageChargePoints()
-        };
+        switch ($this->activeSection) {
+            case 'charge-points':
+                $sectionContent = $this->manageChargePoints();
+                break;
+            case 'users':
+                $sectionContent = $this->manageUserAccounts();
+                break;
+            case 'messages':
+                $sectionContent = $this->manageMessages();
+                break;
+            default:
+                $sectionContent = $this->manageChargePoints();
+        }
 
         $this->render('homeowner/index', [
             'title' => 'Homeowner Dashboard',

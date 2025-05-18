@@ -13,13 +13,21 @@ class AdminController extends BaseController
     {
         $this->activeSection = $_GET['section'] ?? 'reports';
 
-        $sectionContent = match ($this->activeSection) {
-            'reports' => $this->systemReports(),
-            'charge-points' => $this->manageChargePoints(),
-            'users' => $this->manageUserAccounts(),
-            'homeowner-requests' => $this->manageHomeownerRequests(),
-            default => $this->systemReports()
-        };
+        switch ($this->activeSection) {
+            case 'charge-points':
+                $sectionContent = $this->manageChargePoints();
+                break;
+            case 'users':
+                $sectionContent = $this->manageUserAccounts();
+                break;
+            case 'homeowner-requests':
+                $sectionContent = $this->manageHomeownerRequests();
+                break;
+            case 'reports':
+            default:
+                $sectionContent = $this->systemReports();
+                break;
+        }
 
         $this->render('admin/index', [
             'title' => 'Admin Dashboard',

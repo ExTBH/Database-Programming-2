@@ -29,10 +29,16 @@ $requests = HomeOwnerRequest::getAll();
                     <td><?= htmlspecialchars(date('M j, Y', strtotime($request->created_at))) ?></td>
                     <td>
                         <?php
-                        $statusClass = match ($request->approval_status) {
-                            'approved' => 'bg-success',
-                            'rejected' => 'bg-danger',
-                            default => 'bg-warning text-dark'
+                        switch ($request->approval_status) {
+                            case 'approved':
+                                $statusClass = 'bg-success';
+                                break;
+                            case 'rejected':
+                                $statusClass = 'bg-danger';
+                                break;
+                            default:
+                                $statusClass = 'bg-warning text-dark';
+                                break;
                         };
                         ?>
                         <span class="badge <?= $statusClass ?>">
