@@ -5,7 +5,7 @@ require_once __DIR__ . '/../models/User.php';
 
 class AdminController extends BaseController
 {
-    private string $activeSection;
+    private $activeSection;
 
     public function __construct() {}
 
