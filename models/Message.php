@@ -1,24 +1,45 @@
 <?php
 
-
 class Message
 {
-    public int $message_id;
-    public int $sender_id;
-    public int $recipient_id;
-    public string $subject;
-    public string $message;
-    public string $created_at;
-    public bool $is_read;
+    /** @var int */
+    public $message_id;
 
+    /** @var int */
+    public $sender_id;
+
+    /** @var int */
+    public $recipient_id;
+
+    /** @var string */
+    public $subject;
+
+    /** @var string */
+    public $message;
+
+    /** @var string */
+    public $created_at;
+
+    /** @var bool */
+    public $is_read;
+
+    /**
+     * @param int $message_id
+     * @param int $sender_id
+     * @param int $recipient_id
+     * @param string $subject
+     * @param string $message
+     * @param string $created_at
+     * @param bool $is_read
+     */
     public function __construct(
-        int $message_id,
-        int $sender_id,
-        int $recipient_id,
-        string $subject,
-        string $message,
-        string $created_at,
-        bool $is_read
+        $message_id,
+        $sender_id,
+        $recipient_id,
+        $subject,
+        $message,
+        $created_at,
+        $is_read
     ) {
         $this->message_id = $message_id;
         $this->sender_id = $sender_id;
@@ -28,7 +49,12 @@ class Message
         $this->created_at = $created_at;
         $this->is_read = $is_read;
     }
-    private static function fromRow(array $row): Message
+
+    /**
+     * @param array $row
+     * @return Message
+     */
+    private static function fromRow($row)
     {
         return new Message(
             (int)$row['message_id'],
@@ -40,7 +66,12 @@ class Message
             (bool)$row['is_read']
         );
     }
-    public static function getAllForHomeowner(int $homeowner_id): array
+
+    /**
+     * @param int $homeowner_id
+     * @return Message[]
+     */
+    public static function getAllForHomeowner($homeowner_id)
     {
         $conn = Database::getInstance()->getConnection();
         $stmt = $conn->prepare("SELECT * FROM messages WHERE recipient_id = ?");
@@ -49,17 +80,29 @@ class Message
         return array_map([self::class, 'fromRow'], $rows);
     }
 
+    /**
+     * @param int $sender_id
+     * @param int $recipient_id
+     * @param string $subject
+     * @param string $message
+     * @return void
+     */
     public static function addMessage(
-        int $sender_id,
-        int $recipient_id,
-        string $subject,
-        string $message
-    ): void {
+        $sender_id,
+        $recipient_id,
+        $subject,
+        $message
+    ) {
         $conn = Database::getInstance()->getConnection();
         $stmt = $conn->prepare("INSERT INTO messages (sender_id, recipient_id, subject, message, created_at, is_read) VALUES (?, ?, ?, ?, NOW(), 0)");
         $stmt->execute([$sender_id, $recipient_id, $subject, $message]);
     }
-    public static function markAsRead(int $message_id): void
+
+    /**
+     * @param int $message_id
+     * @return void
+     */
+    public static function markAsRead($message_id)
     {
         $conn = Database::getInstance()->getConnection();
         $stmt = $conn->prepare("UPDATE messages SET is_read = 1 WHERE message_id = ?");

@@ -45,7 +45,7 @@ require_once __DIR__ . '/../../config.php';
                 </div>
                 <!-- Request to be a Homeowner Checkbox -->
                 <div class="form-check mb-3">
-                    <input type="checkbox" id="request_homeowner" name="request_homeowner" class="form-check-input" value = "1">
+                    <input type="checkbox" id="request_homeowner" name="request_homeowner" class="form-check-input" value="1">
                     <label for="request_homeowner" class="form-check-label">Request to be a Homeowner</label>
                 </div>
                 <!-- Sign Up Button -->
@@ -75,9 +75,12 @@ require_once __DIR__ . '/../../config.php';
                 method: 'POST',
                 body: formData
             });
+
+
+
             const data = await response.json();
 
-            if (!response.ok) {
+            if (data.error) {
                 errorDiv.textContent = data.error || 'An error occurred.';
                 errorDiv.classList.remove('d-none');
             } else {

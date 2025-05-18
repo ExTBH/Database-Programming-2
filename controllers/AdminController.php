@@ -7,14 +7,7 @@ class AdminController extends BaseController
 {
     private string $activeSection;
 
-    public function __construct()
-    {
-        // // Check if user is logged in and is admin
-        // if (!isset($_SESSION[USER_SESSION_KEY]) || $_SESSION[USER_SESSION_KEY]['role'] !== 'admin') {
-        //     header('Location: ' . PREFIX . '/login.php');
-        //     exit;
-        // }
-    }
+    public function __construct() {}
 
     public function index(): void
     {

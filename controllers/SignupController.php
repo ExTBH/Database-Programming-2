@@ -34,21 +34,21 @@ class SignupController extends BaseController
         }
 
 
-        if ($existingRequest && $existingRequest->approval_status->value == 'pending') {
+        if ($existingRequest && $existingRequest->approval_status == 'pending') {
             http_response_code(409); // Conflict
             header('Content-Type: application/json');
             echo json_encode(['error' => 'Email already exists in the request list. Please wait for approval.']);
             return;
         }
 
-         if ($existingRequest && $existingRequest->approval_status->value == 'rejected') {
+        if ($existingRequest && $existingRequest->approval_status == 'rejected') {
 
             error_log("User request is rejected: " . json_encode($existingRequest));
             http_response_code(409); // Conflict
             header('Content-Type: application/json');
             echo json_encode(['error' => 'Your request had been resubmitted.']);
             //redirect to index after 5 seconds
-          
+
             return;
         }
 
@@ -85,14 +85,14 @@ class SignupController extends BaseController
     public function createRequest($first_name, $last_name, $email, $password)
     {
         $conn = Database::getInstance()->getConnection();
-        
+
         // Check if request already exists
         $existingRequest = HomeOwnerRequest::getByEmail($email);
 
-        
+
 
         $existingUser = User::getByEmail($email);
-        
+
         if ($existingUser) {
             http_response_code(409); // Conflict
             header(header: 'Content-Type: application/json');
@@ -100,7 +100,7 @@ class SignupController extends BaseController
             return;
         }
 
-        if ($existingRequest && $existingRequest->approval_status->value == 'rejected') {
+        if ($existingRequest && $existingRequest->approval_status == 'rejected') {
             // Update existing request to pending status
             $stmt = $conn->prepare("UPDATE HomeOwnerRequests SET approval_status = 'pending', 
                                   first_name = ?, last_name = ?, password = ?, 
@@ -114,24 +114,23 @@ class SignupController extends BaseController
                 $email
             ]);
 
-              if ($success) {
-                                    http_response_code(409); // Conflict
-            header('Content-Type: application/json');
-            echo json_encode(['error' => 'Your request had been resubmitted.']);
-            return;
-                                }
-        } else if($existingRequest && $existingRequest->approval_status->value == 'pending') {
+            if ($success) {
+                http_response_code(409); // Conflict
+                header('Content-Type: application/json');
+                echo json_encode(['error' => 'Your request had been resubmitted.']);
+                return;
+            }
+        } else if ($existingRequest && $existingRequest->approval_status == 'pending') {
             http_response_code(409); // Conflict
             header('Content-Type: application/json');
             echo json_encode(['error' => 'Email already exists in the request list. Please wait for approval.']);
             return;
-
-        }else {
+        } else {
             // Create new request
             $stmt = $conn->prepare("INSERT INTO HomeOwnerRequests(email, first_name, last_name, 
                                   password, created_at, approval_status, rejection_message) 
                                   VALUES (?, ?, ?, ?, NOW(), 'pending', NULL)");
-            
+
             $success = $stmt->execute([
                 $email,
                 $first_name,
@@ -150,5 +149,4 @@ class SignupController extends BaseController
             echo json_encode(['error' => 'Failed to submit request']);
         }
     }
-
 }

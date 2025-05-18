@@ -33,9 +33,9 @@ $user = User::fromSession();
                 <a href="<?= PREFIX ?>/signup.php" class="btn d-flex align-items-center justify-content-center h-100 px-4 bg-light text-sm font-weight-bold rounded-lg text-dark hover-bg-light">Sign up</a>
             <?php else: ?>
 
-                <?php if ($user->role === UserRole::ADMIN->value): ?>
+                <?php if ($user->role === 'admin'): ?>
                     <a href="<?= PREFIX ?>/admin.php" class="btn d-flex align-items-center justify-content-center px-3 h-100 text-sm font-weight-bold rounded-lg hover-bg-light">Admin Dashboard</a>
-                <?php elseif ($user->role === UserRole::HOME_OWNER->value): ?>
+                <?php elseif ($user->role === 'homeowner'): ?>
                     <a href="<?= PREFIX ?>/homeowner.php" class="btn d-flex align-items-center justify-content-center px-3 h-100 text-sm font-weight-bold rounded-lg hover-bg-light">Homeowner Dashboard</a>
                 <?php else: ?>
                     <a href="<?= PREFIX ?>/booking.php" class="btn d-flex align-items-center justify-content-center px-3 h-100 text-sm font-weight-bold rounded-lg hover-bg-light">My Bookings</a>
