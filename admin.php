@@ -200,7 +200,7 @@ case 'addChargePointForm':
             $isAvailable,
             $imageContent // Pass the raw image content directly
         );
-        echo json_encode(['success' => true, 'message' => 'Charge point added successfully.']);
+      //  echo json_encode(['success' => true, 'message' => 'Charge point added successfully.']);
     } catch (Exception $e) {
         error_log('Error adding charge point: ' . $e->getMessage()); // Log exceptions
         echo json_encode(['success' => false, 'message' => 'Failed to add charge point: ' . $e->getMessage()]);
