@@ -403,8 +403,8 @@ $AllChargePoints = ChargePoint::getAll($offset, $limit);
                     }
                 } else {
                     // For add, reload to show the new row
-                    window.location.reload();
                 }
+                window.location.reload();
 
                 // Hide the modal and reset the form
                 const modal = bootstrap.Modal.getInstance(document.getElementById(modalId));
@@ -452,6 +452,8 @@ $AllChargePoints = ChargePoint::getAll($offset, $limit);
                         // Remove the row from the table using the row ID
                         const row = document.querySelector(`[data-row-id="${rowId}"]`).closest('tr');
                         if (row) row.remove();
+
+                        window.location.reload();
                     } else {
                         alert(data.message || 'Failed to delete charge point.');
                     }
