@@ -147,12 +147,16 @@ class ChargePoint
     }
 
     /**
+     * @param int $offset
+     * @param int $limit
      * @return ChargePoint[]
      */
-    public static function getAll()
+    public static function getAll($offset = 0, $limit = 10)
     {
         $conn = Database::getInstance()->getConnection();
-        $stmt = $conn->prepare("SELECT * FROM charge_points");
+        $stmt = $conn->prepare("SELECT * FROM charge_points ORDER BY charge_point_id DESC LIMIT :limit OFFSET :offset");
+        $stmt->bindValue(':limit', (int)$limit, \PDO::PARAM_INT);
+        $stmt->bindValue(':offset', (int)$offset, \PDO::PARAM_INT);
         $stmt->execute();
         $chargePoints = [];
 
