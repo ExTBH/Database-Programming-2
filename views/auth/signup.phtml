@@ -84,7 +84,12 @@ require_once __DIR__ . '/../../config.php';
                 errorDiv.textContent = data.error || 'An error occurred.';
                 errorDiv.classList.remove('d-none');
             } else {
-                window.location.href = data.redirect
+                // Check if request_homeowner was checked
+                if (formData.get('request_homeowner')) {
+                    alert('Application has been submitted and will be reviewed.');
+                } else {
+                    window.location.href = data.redirect;
+                }
             }
         } catch (err) {
             errorDiv.textContent = err.message;
