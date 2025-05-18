@@ -3,42 +3,7 @@
 require_once __DIR__ . '/../database.php';
 require_once __DIR__ . '/../models/User.php';
 
-class ApprovalStatus
-{
-    const PENDING = 'pending';
-    const APPROVED = 'approved';
-    const REJECTED = 'rejected';
 
-    /** @var string */
-    private $status;
-
-    /**
-     * @param string $status
-     * @throws InvalidArgumentException
-     */
-    public function __construct($status)
-    {
-        if (!in_array($status, [self::PENDING, self::APPROVED, self::REJECTED])) {
-            throw new InvalidArgumentException('Invalid status');
-        }
-        $this->status = $status;
-    }
-
-    /** @return string */
-    public function getValue()
-    {
-        return $this->status;
-    }
-
-    /**
-     * @param string $value
-     * @return self
-     */
-    public static function from($value)
-    {
-        return new self($value);
-    }
-}
 
 class HomeOwnerRequest
 {
@@ -60,7 +25,7 @@ class HomeOwnerRequest
     /** @var string */
     public $created_at;
 
-    /** @var ApprovalStatus */
+    /** @var string: pending, approved, rejected */
     public $approval_status;
 
     /** @var string|null */
@@ -73,7 +38,7 @@ class HomeOwnerRequest
      * @param string $last_name
      * @param string $password
      * @param string $created_at
-     * @param ApprovalStatus $approval_status
+     * @param string $approval_status
      * @param string|null $rejection_message
      */
     public function __construct(
@@ -109,7 +74,7 @@ class HomeOwnerRequest
             $row['last_name'],
             $row['password'],
             $row['created_at'],
-            ApprovalStatus::from($row['approval_status']),
+            $row['approval_status'],
             $row['rejection_message']
         );
     }
@@ -181,7 +146,7 @@ class HomeOwnerRequest
 
             // Update request status to approved
             $stmt = $conn->prepare("UPDATE HomeOwnerRequests SET approval_status = ? WHERE id = ?");
-            $stmt->execute([ApprovalStatus::APPROVED, $id]);
+            $stmt->execute(['approved', $id]);
 
             // Create new user with specific column order
             $orderedData = [
@@ -227,6 +192,6 @@ class HomeOwnerRequest
     {
         $conn = Database::getInstance()->getConnection();
         $stmt = $conn->prepare("UPDATE HomeOwnerRequests SET approval_status = ?, rejection_message = ? WHERE id = ?");
-        return $stmt->execute([ApprovalStatus::REJECTED, $message, $id]);
+        return $stmt->execute(['rejected', $message, $id]);
     }
 }
