@@ -29,35 +29,71 @@ function imageToBase64Url($imagePath)
     return 'data:' . $mimeType . ';base64,' . $base64;
 }
 
-
 class ChargePoint
 {
-    public int $charge_point_id;
-    public int $homeowner_id;
-    public string $address;
-    public string $postcode;
-    public float $latitude;
-    public float $longitude;
-    public float $price_per_kwh;
-    public ?string $description;
-    public bool $is_available;
-    public string $created_at;
-    public string $updated_at;
-    public string $image;
+    /** @var int */
+    public $charge_point_id;
 
+    /** @var int */
+    public $homeowner_id;
+
+    /** @var string */
+    public $address;
+
+    /** @var string */
+    public $postcode;
+
+    /** @var float */
+    public $latitude;
+
+    /** @var float */
+    public $longitude;
+
+    /** @var float */
+    public $price_per_kwh;
+
+    /** @var string|null */
+    public $description;
+
+    /** @var bool */
+    public $is_available;
+
+    /** @var string */
+    public $created_at;
+
+    /** @var string */
+    public $updated_at;
+
+    /** @var string */
+    public $image;
+
+    /**
+     * @param int $charge_point_id
+     * @param int $homeowner_id
+     * @param string $address
+     * @param string $postcode
+     * @param float $latitude
+     * @param float $longitude
+     * @param float $price_per_kwh
+     * @param string|null $description
+     * @param bool $is_available
+     * @param string $created_at
+     * @param string $updated_at
+     * @param string $image
+     */
     public function __construct(
-        int $charge_point_id,
-        int $homeowner_id,
-        string $address,
-        string $postcode,
-        float $latitude,
-        float $longitude,
-        float $price_per_kwh,
-        ?string $description,
-        bool $is_available,
-        string $created_at,
-        string $updated_at,
-        string $image
+        $charge_point_id,
+        $homeowner_id,
+        $address,
+        $postcode,
+        $latitude,
+        $longitude,
+        $price_per_kwh,
+        $description,
+        $is_available,
+        $created_at,
+        $updated_at,
+        $image
     ) {
         $this->charge_point_id = $charge_point_id;
         $this->homeowner_id = $homeowner_id;
@@ -73,7 +109,11 @@ class ChargePoint
         $this->image = $image;
     }
 
-    private static function fromRow(array $row): ChargePoint
+    /**
+     * @param array $row
+     * @return ChargePoint
+     */
+    private static function fromRow($row)
     {
         return new ChargePoint(
             $row['charge_point_id'],
@@ -90,7 +130,11 @@ class ChargePoint
             $row['image'] ?? null
         );
     }
-    public static function getAll(): array
+
+    /**
+     * @return ChargePoint[]
+     */
+    public static function getAll()
     {
         $conn = Database::getInstance()->getConnection();
         $stmt = $conn->prepare("SELECT * FROM charge_points");
@@ -103,7 +147,12 @@ class ChargePoint
 
         return $chargePoints;
     }
-    public static function getById(int $id): ?ChargePoint
+
+    /**
+     * @param int $id
+     * @return ChargePoint|null
+     */
+    public static function getById($id)
     {
         $conn = Database::getInstance()->getConnection();
         $stmt = $conn->prepare("SELECT * FROM charge_points WHERE charge_point_id = ?");
@@ -116,7 +165,12 @@ class ChargePoint
 
         return null;
     }
-    public static function getByHomeownerId(int $homeowner_id): array
+
+    /**
+     * @param int $homeowner_id
+     * @return ChargePoint[]
+     */
+    public static function getByHomeownerId($homeowner_id)
     {
         $conn = Database::getInstance()->getConnection();
         $stmt = $conn->prepare("SELECT * FROM charge_points WHERE homeowner_id = ?");
@@ -130,7 +184,11 @@ class ChargePoint
         return $chargePoints;
     }
 
-    public static function getEmailById(int $charge_point_id): ?string 
+    /**
+     * @param int $charge_point_id
+     * @return string|null
+     */
+    public static function getEmailById($charge_point_id)
     {
         $conn = Database::getInstance()->getConnection();
         $stmt = $conn->prepare("
@@ -141,23 +199,38 @@ class ChargePoint
         ");
         $stmt->execute([$charge_point_id]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        
+
         return $result ? $result['email'] : null;
     }
 
+    /**
+     * @param string $action
+     * @param int|null $chargePointId
+     * @param int|null $homeownerId
+     * @param string|null $address
+     * @param string|null $postcode
+     * @param float|null $latitude
+     * @param float|null $longitude
+     * @param float|null $pricePerKwh
+     * @param string|null $description
+     * @param bool|null $isAvailable
+     * @param string|null $imagePath
+     * @return bool
+     * @throws InvalidArgumentException
+     */
     public static function manageChargePoint(
-        string $action,
-        ?int $chargePointId = null,
-        ?int $homeownerId = null,
-        ?string $address = null,
-        ?string $postcode = null,
-        ?float $latitude = null,
-        ?float $longitude = null,
-        ?float $pricePerKwh = null,
-        ?string $description = null,
-        ?bool $isAvailable = null,
-        ?string $imagePath = null // <-- New parameter
-    ): bool {
+        $action,
+        $chargePointId = null,
+        $homeownerId = null,
+        $address = null,
+        $postcode = null,
+        $latitude = null,
+        $longitude = null,
+        $pricePerKwh = null,
+        $description = null,
+        $isAvailable = null,
+        $imagePath = null
+    ) {
         $conn = Database::getInstance()->getConnection();
 
         try {
@@ -178,7 +251,6 @@ class ChargePoint
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW(), ?)
                     ");
 
-                
                     return $stmt->execute([
                         $homeownerId,
                         $address,
@@ -265,7 +337,10 @@ class ChargePoint
         }
     }
 
-    public static function countAll(): int
+    /**
+     * @return int
+     */
+    public static function countAll()
     {
         $conn = Database::getInstance()->getConnection();
         $stmt = $conn->prepare("SELECT COUNT(*) AS charge_point_count FROM charge_points");
@@ -275,43 +350,53 @@ class ChargePoint
         return $row ? (int)$row['charge_point_count'] : 0;
     }
 
- public static function getHomeownerByChargePointId(int $chargePointId): ?array
-{
-    $conn = Database::getInstance()->getConnection();
-    $stmt = $conn->prepare("
-        SELECT u.user_id AS homeowner_id, u.first_name, u.last_name, u.email 
-        FROM charge_points cp
-        INNER JOIN users u ON cp.homeowner_id = u.user_id
-        WHERE cp.charge_point_id = ?
-    ");
-    $stmt->execute([$chargePointId]);
-    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    /**
+     * @param int $chargePointId
+     * @return array|null
+     */
+    public static function getHomeownerByChargePointId($chargePointId)
+    {
+        $conn = Database::getInstance()->getConnection();
+        $stmt = $conn->prepare("
+            SELECT u.user_id AS homeowner_id, u.first_name, u.last_name, u.email 
+            FROM charge_points cp
+            INNER JOIN users u ON cp.homeowner_id = u.user_id
+            WHERE cp.charge_point_id = ?
+        ");
+        $stmt->execute([$chargePointId]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    return $row ?: null;
-}
+        return $row ?: null;
+    }
 
-public static function deleteChargePoint(int $chargePointId): bool
-{
-    $conn = Database::getInstance()->getConnection();
-    $stmt = $conn->prepare("DELETE FROM charge_points WHERE charge_point_id = ?");
-    return $stmt->execute([$chargePointId]);
-}
+    /**
+     * @param int $chargePointId
+     * @return bool
+     */
+    public static function deleteChargePoint($chargePointId)
+    {
+        $conn = Database::getInstance()->getConnection();
+        $stmt = $conn->prepare("DELETE FROM charge_points WHERE charge_point_id = ?");
+        return $stmt->execute([$chargePointId]);
+    }
 
-public function update(): bool
-{
-    return self::manageChargePoint(
-        'update',
-        $this->charge_point_id,
-        $this->homeowner_id,
-        $this->address,
-        $this->postcode,
-        $this->latitude,
-        $this->longitude,
-        $this->price_per_kwh,
-        $this->description,
-        $this->is_available,
-        $this->image // assumes this is a file path or already base64 if coming from DB
-    );
-}
-
+    /**
+     * @return bool
+     */
+    public function update()
+    {
+        return self::manageChargePoint(
+            'update',
+            $this->charge_point_id,
+            $this->homeowner_id,
+            $this->address,
+            $this->postcode,
+            $this->latitude,
+            $this->longitude,
+            $this->price_per_kwh,
+            $this->description,
+            $this->is_available,
+            $this->image
+        );
+    }
 }
