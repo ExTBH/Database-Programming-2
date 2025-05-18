@@ -1,6 +1,12 @@
 <?php
 require_once __DIR__ . '/../../../models/User.php';
-$users = User::getAll();
+// Pagination logic
+$page = isset($_GET['page']) && is_numeric($_GET['page']) && $_GET['page'] > 0 ? (int)$_GET['page'] : 1;
+$limit = 10;
+$offset = ($page - 1) * $limit;
+$totalUsers = User::countAll();
+$totalPages = (int)ceil($totalUsers / $limit);
+$users = User::getAll($offset, $limit);
 ?>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -9,6 +15,8 @@ $users = User::getAll();
         <i class="fa-solid fa-user-plus me-2"></i>Add User
     </button>
 </div>
+
+
 
 <!-- Users Table -->
 <div class="table-responsive">
@@ -88,6 +96,22 @@ $users = User::getAll();
         </tbody>
     </table>
 </div>
+
+<nav aria-label="User Accounts Pagination">
+    <ul class="pagination justify-content-center mt-3">
+        <li class="page-item<?= $page <= 1 ? ' disabled' : '' ?>">
+            <a class="page-link" href="?section=users&page=<?= $page - 1 ?>" tabindex="-1">Previous</a>
+        </li>
+        <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+            <li class="page-item<?= $i == $page ? ' active' : '' ?>">
+                <a class="page-link" href="?section=users&page=<?= $i ?>"><?= $i ?></a>
+            </li>
+        <?php endfor; ?>
+        <li class="page-item<?= $page >= $totalPages ? ' disabled' : '' ?>">
+            <a class="page-link" href="?section=users&page=<?= $page + 1 ?>">Next</a>
+        </li>
+    </ul>
+</nav>
 
 <!-- Add User Modal -->
 <div class="modal fade" id="addUserModal" tabindex="-1">

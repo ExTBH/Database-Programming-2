@@ -77,12 +77,16 @@ class User
     }
 
     /**
+     * @param int $offset
+     * @param int $limit
      * @return User[]
      */
-    public static function getAll()
+    public static function getAll($offset = 0, $limit = 10)
     {
         $conn = Database::getInstance()->getConnection();
-        $stmt = $conn->prepare("SELECT * FROM users");
+        $stmt = $conn->prepare("SELECT * FROM users ORDER BY user_id DESC LIMIT :limit OFFSET :offset");
+        $stmt->bindValue(':limit', (int)$limit, \PDO::PARAM_INT);
+        $stmt->bindValue(':offset', (int)$offset, \PDO::PARAM_INT);
         $stmt->execute();
         $users = [];
 
