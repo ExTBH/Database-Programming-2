@@ -3,6 +3,23 @@
 require_once __DIR__ . '/../database.php';
 
 /**
+ * Converts image data to a Base64-encoded data URL.
+ *
+ * @param string $imageData Raw image data
+ * @param string $mimeType The MIME type of the image (e.g., 'image/jpeg')
+ * @return string|false The Base64 image URL or false on failure
+ */
+function imageDataToBase64Url($imageData, $mimeType)
+{
+    if (empty($imageData) || empty($mimeType)) {
+        return false;
+    }
+
+    $base64 = base64_encode($imageData);
+    return 'data:' . $mimeType . ';base64,' . $base64;
+}
+
+/**
  * Converts an image file to a Base64-encoded data URL.
  *
  * @param string $imagePath Path to the image file
@@ -19,14 +36,12 @@ function imageToBase64Url($imagePath)
         return false; // Not a valid image
     }
 
-    $mimeType = $imageInfo['mime'];
     $imageData = file_get_contents($imagePath);
     if ($imageData === false) {
         return false;
     }
 
-    $base64 = base64_encode($imageData);
-    return 'data:' . $mimeType . ';base64,' . $base64;
+    return imageDataToBase64Url($imageData, $imageInfo['mime']);
 }
 
 class ChargePoint
@@ -214,7 +229,8 @@ class ChargePoint
      * @param float|null $pricePerKwh
      * @param string|null $description
      * @param bool|null $isAvailable
-     * @param string|null $imagePath
+     * @param string|null $imageData Raw image data
+     * @param string|null $imageMimeType Image MIME type
      * @return bool
      * @throws InvalidArgumentException
      */
@@ -229,7 +245,8 @@ class ChargePoint
         $pricePerKwh = null,
         $description = null,
         $isAvailable = null,
-        $imagePath = null
+        $imageData = null,
+        $imageMimeType = null
     ) {
         $conn = Database::getInstance()->getConnection();
 
@@ -243,7 +260,7 @@ class ChargePoint
                         throw new InvalidArgumentException("Missing required fields for charge point creation");
                     }
 
-                    $base64Image = $imagePath ? imageToBase64Url($imagePath) : null;
+                    $base64Image = ($imageData && $imageMimeType) ? imageDataToBase64Url($imageData, $imageMimeType) : null;
 
                     $stmt = $conn->prepare("
                         INSERT INTO charge_points 
@@ -303,8 +320,8 @@ class ChargePoint
                         $updates[] = "is_available = ?";
                         $params[] = (int)$isAvailable;
                     }
-                    if ($imagePath !== null) {
-                        $base64Image = imageToBase64Url($imagePath);
+                    if ($imageData !== null && $imageMimeType !== null) {
+                        $base64Image = imageDataToBase64Url($imageData, $imageMimeType);
                         $updates[] = "image = ?";
                         $params[] = $base64Image;
                     }
@@ -396,7 +413,8 @@ class ChargePoint
             $this->price_per_kwh,
             $this->description,
             $this->is_available,
-            $this->image
+            null, // imageData
+            null  // imageMimeType - since the instance's image property stores the complete base64 URL
         );
     }
 }

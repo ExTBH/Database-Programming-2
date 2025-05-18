@@ -237,9 +237,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 // Handle image if provided
                 $imageContent = null;
+                $imageMime = null;
                 if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
                     $imageContent = file_get_contents($_FILES['image']['tmp_name']);
+                    $imageMime = mime_content_type($_FILES['image']['tmp_name']);
                 }
+                if ($imageContent && !in_array($imageMime, ['image/jpeg', 'image/png'])) {
+                    error_log('Invalid image type: ' . $imageMime);
+                    echo json_encode(['success' => false, 'message' => 'Invalid image type.']);
+                    exit;
+                }
+
 
                 try {
                     ChargePoint::manageChargePoint(
@@ -253,7 +261,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $pricePerKwh,
                         $description,
                         $isAvailable,
-                        $imageContent
+                        $imageContent,
+                        $imageMime
+
                     );
 
                     echo json_encode(['success' => true, 'message' => 'Charge point updated successfully.']);

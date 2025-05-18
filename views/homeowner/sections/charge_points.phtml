@@ -88,7 +88,8 @@ $AllChargePoints = ChargePoint::getByHomeownerId($user->id);
                             data-homeowner-email="<?= htmlspecialchars(User::getById($ChargePoint->homeowner_id)->email ?? '') ?>"
                             <?php error_log("Charge point email owner : " . User::getById($ChargePoint->homeowner_id)->email); ?>
                             data-description="<?= htmlspecialchars($ChargePoint->description ?? '') ?>"
-                            data-is-available="<?= $ChargePoint->is_available ? '1' : '0' ?>">
+                            data-is-available="<?= $ChargePoint->is_available ? '1' : '0' ?>"
+                            data-has-image="<?= !empty($ChargePoint->image) ? '1' : '0' ?>">
                             <i class="fa-solid fa-edit"></i>
                         </button>
                         <button class="btn btn-danger btn-sm delete-charge-point"
@@ -148,7 +149,11 @@ $AllChargePoints = ChargePoint::getByHomeownerId($user->id);
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Attach Image</label>
+                        <div id="existingImageNotice" class="alert alert-info d-none mb-2">
+                            <i class="fa-solid fa-info-circle me-2"></i>An existing image is attached
+                        </div>
                         <input type="file" name="image" id="edit_image" class="form-control" accept="image/*">
+                        <small class="form-text text-muted">Uploading a new image will replace the existing one</small>
                     </div>
                     <div class="form-check mb-3">
                         <input type="checkbox" name="is_available" id="edit_is_available" class="form-check-input">
@@ -420,6 +425,15 @@ $AllChargePoints = ChargePoint::getByHomeownerId($user->id);
             const homeownerEmail = this.getAttribute('data-homeowner-email');
             const description = this.getAttribute('data-description');
             const isAvailable = this.getAttribute('data-is-available') === '1';
+            const hasImage = this.getAttribute('data-has-image') === '1';
+
+            // Handle existing image notice
+            const existingImageNotice = document.getElementById('existingImageNotice');
+            if (hasImage) {
+                existingImageNotice.classList.remove('d-none');
+            } else {
+                existingImageNotice.classList.add('d-none');
+            }
 
             // Populate the modal fields
             document.getElementById('edit_charge_point_id').value = chargePointId;
