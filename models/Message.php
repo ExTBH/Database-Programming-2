@@ -69,15 +69,34 @@ class Message
 
     /**
      * @param int $homeowner_id
+     * @param int $offset
+     * @param int $limit
      * @return Message[]
      */
-    public static function getAllForHomeowner($homeowner_id)
+    public static function getAllForHomeowner($homeowner_id, $offset = 0, $limit = 10)
     {
         $conn = Database::getInstance()->getConnection();
-        $stmt = $conn->prepare("SELECT * FROM messages WHERE recipient_id = ?");
-        $stmt->execute([$homeowner_id]);
+        $stmt = $conn->prepare("SELECT * FROM messages WHERE recipient_id = :homeowner_id ORDER BY message_id DESC LIMIT :limit OFFSET :offset");
+        $stmt->bindValue(':homeowner_id', $homeowner_id, \PDO::PARAM_INT);
+        $stmt->bindValue(':limit', (int)$limit, \PDO::PARAM_INT);
+        $stmt->bindValue(':offset', (int)$offset, \PDO::PARAM_INT);
+        $stmt->execute();
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
         return array_map([self::class, 'fromRow'], $rows);
+    }
+
+    /**
+     * @param int $homeowner_id
+     * @return int
+     */
+    public static function countForHomeowner($homeowner_id)
+    {
+        $conn = Database::getInstance()->getConnection();
+        $stmt = $conn->prepare("SELECT COUNT(*) AS message_count FROM messages WHERE recipient_id = ?");
+        $stmt->execute([$homeowner_id]);
+        $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        return $row ? (int)$row['message_count'] : 0;
     }
 
     /**
