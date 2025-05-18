@@ -55,7 +55,7 @@ class RentController extends BaseController
                 User::fromSession()->id,
                 $startDateTime,
                 $endDateTime,
-                BookingStatus::Pending,
+                'pending',
                 $totalPrice,
             );
         } catch (Exception $e) {

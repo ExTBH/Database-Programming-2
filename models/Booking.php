@@ -2,50 +2,7 @@
 
 require_once __DIR__ . '/../database.php';
 
-class BookingStatus
-{
-    const PENDING = 'pending';
-    const APPROVED = 'approved';
-    const DECLINED = 'declined';
-    const COMPLETED = 'completed';
-    const CANCELLED = 'cancelled';
 
-    /** @var string */
-    private $status;
-
-    /**
-     * @param string $status
-     * @throws InvalidArgumentException
-     */
-    public function __construct($status)
-    {
-        if (!in_array($status, [
-            self::PENDING,
-            self::APPROVED,
-            self::DECLINED,
-            self::COMPLETED,
-            self::CANCELLED
-        ])) {
-            throw new InvalidArgumentException('Invalid status');
-        }
-        $this->status = $status;
-    }
-
-    /** @return string */
-    public function getValue()
-    {
-        return $this->status;
-    }
-
-    /**
-     * @param string $value
-     * @return self
-     */
-    public static function from($value)
-    {
-        return new self($value);
-    }
-}
 
 class Booking
 {
@@ -64,7 +21,7 @@ class Booking
     /** @var DateTime */
     public $end_time;
 
-    /** @var BookingStatus */
+    /** @var string: pending, approved, declined, cancelled, completed */
     public $status;
 
     /** @var string */
@@ -79,7 +36,7 @@ class Booking
      * @param int $user_id
      * @param DateTime $start_time
      * @param DateTime $end_time
-     * @param BookingStatus $status
+     * @param string $status
      * @param string $created_at
      * @param string $updated_at
      */
@@ -89,7 +46,7 @@ class Booking
         $user_id,
         DateTime $start_time,
         DateTime $end_time,
-        BookingStatus $status,
+        string $status,
         $created_at,
         $updated_at
     ) {
@@ -115,7 +72,7 @@ class Booking
             (int)$row['user_id'],
             new DateTime($row['start_time']),
             new DateTime($row['end_time']),
-            BookingStatus::from($row['status']),
+            $row['status'],
             $row['created_at'],
             $row['updated_at']
         );
@@ -201,7 +158,7 @@ class Booking
      * @param int $user_id
      * @param DateTime $start_time
      * @param DateTime $end_time
-     * @param BookingStatus $status
+     * @param string $status
      * @return Booking
      */
     public static function add(
@@ -209,7 +166,7 @@ class Booking
         $user_id,
         DateTime $start_time,
         DateTime $end_time,
-        BookingStatus $status
+        string $status
     ) {
         $conn = Database::getInstance()->getConnection();
         $stmt = $conn->prepare(
@@ -221,7 +178,7 @@ class Booking
             $user_id,
             $start_time->format('Y-m-d H:i:s'),
             $end_time->format('Y-m-d H:i:s'),
-            $status->getValue()
+            $status
         ]);
 
         return new Booking(
@@ -243,7 +200,7 @@ class Booking
     {
         $conn = Database::getInstance()->getConnection();
         $stmt = $conn->prepare("SELECT COUNT(*) AS pending_count FROM bookings WHERE status = ?");
-        $stmt->execute([BookingStatus::PENDING]);
+        $stmt->execute(['pending']);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
         return $row ? (int)$row['pending_count'] : 0;
@@ -256,7 +213,7 @@ class Booking
     {
         $conn = Database::getInstance()->getConnection();
         $stmt = $conn->prepare("SELECT COUNT(*) AS completed_count FROM bookings WHERE status = ?");
-        $stmt->execute([BookingStatus::COMPLETED]);
+        $stmt->execute(['completed']);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
         return $row ? (int)$row['completed_count'] : 0;
