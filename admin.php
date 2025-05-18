@@ -428,7 +428,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $imageContent
                     );
 
-                    //echo json_encode(['success' => true, 'message' => 'Charge point updated successfully.']);
+                    echo json_encode(['success' => true, 'message' => 'Charge point updated successfully.']);
                 } catch (Exception $e) {
                     echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
                 }
