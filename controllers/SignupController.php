@@ -95,7 +95,7 @@ class SignupController extends BaseController
 
         if ($existingUser) {
             http_response_code(409); // Conflict
-            header(header: 'Content-Type: application/json');
+            header('Content-Type: application/json');
             echo json_encode(['error' => 'Email already exists. Please choose another one.']);
             return;
         }
