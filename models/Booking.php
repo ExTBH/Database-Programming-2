@@ -133,17 +133,24 @@ class Booking
 
     /**
      * @param int $home_owner_id
+     * @param int $offset
+     * @param int $limit
      * @return Booking[]
      */
-    public static function getAllForHomeOwnerId($home_owner_id)
+    public static function getAllForHomeOwnerId($home_owner_id, $offset = 0, $limit = 10)
     {
         $conn = Database::getInstance()->getConnection();
         $stmt = $conn->prepare(
             "SELECT b.* FROM bookings b
              INNER JOIN charge_points cp ON b.charge_point_id = cp.charge_point_id
-             WHERE cp.homeowner_id = ?"
+             WHERE cp.homeowner_id = :home_owner_id
+             ORDER BY b.booking_id DESC
+             LIMIT :limit OFFSET :offset"
         );
-        $stmt->execute([$home_owner_id]);
+        $stmt->bindValue(':home_owner_id', $home_owner_id, \PDO::PARAM_INT);
+        $stmt->bindValue(':limit', (int)$limit, \PDO::PARAM_INT);
+        $stmt->bindValue(':offset', (int)$offset, \PDO::PARAM_INT);
+        $stmt->execute();
         $bookings = [];
 
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -151,6 +158,24 @@ class Booking
         }
 
         return $bookings;
+    }
+
+    /**
+     * @param int $home_owner_id
+     * @return int
+     */
+    public static function countForHomeOwnerId($home_owner_id)
+    {
+        $conn = Database::getInstance()->getConnection();
+        $stmt = $conn->prepare(
+            "SELECT COUNT(*) AS booking_count FROM bookings b
+             INNER JOIN charge_points cp ON b.charge_point_id = cp.charge_point_id
+             WHERE cp.homeowner_id = ?"
+        );
+        $stmt->execute([$home_owner_id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $row ? (int)$row['booking_count'] : 0;
     }
 
     /**
