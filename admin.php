@@ -179,6 +179,13 @@ case 'addChargePointForm':
 
     $homeowner = user::getByEmail($homeownerEmail);
     $homeOwnerId =  $homeowner-> id;
+
+    $existingChargePoints = ChargePoint::getByHomeownerId($homeOwnerId);
+    if (!empty($existingChargePoints)) {
+        echo json_encode(['success' => false, 'message' => 'This homeowner already has a charge point.']);
+        exit;
+    }
+
     try {
         ChargePoint::manageChargePoint(
             'add',
