@@ -275,7 +275,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     );
 
-                    // echo json_encode(['success' => true, 'message' => 'Charge point updated successfully.']);
+                    echo json_encode(['success' => true, 'message' => 'Charge point updated successfully.']);
                 } catch (Exception $e) {
                     error_log('Error updating charge point: ' . $e->getMessage());
                     echo json_encode(['success' => false, 'message' => 'Failed to update charge point: ' . $e->getMessage()]);
