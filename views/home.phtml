@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../models/User.php';
 ?>
 
 <div class="container my-5">
@@ -10,8 +11,12 @@ require_once __DIR__ . '/../config.php';
             <h1 class="display-4 fw-bold text-shadow">Rent from BAHRENT</h1>
             <p class="fs-5 mb-4 text-shadow">Find the perfect charger for your car!</p>
 
-            <?php if (isset($_SESSION[USER_SESSION_KEY])): ?>
-                <a href="<?= PREFIX ?>/browse.php" class="btn btn-success btn-lg fw-bold">Rent a Charger</a>
+            <?php if (User::fromSession()): ?>
+
+                <?php if (User::fromSession()->role == 'user'): ?>
+                    <a href="<?= PREFIX ?>/browse.php" class="btn btn-success btn-lg fw-bold">Rent a Charger</a>
+                <?php endif; ?>
+
             <?php else: ?>
                 <a href="<?= PREFIX ?>/login.php" class="btn btn-success btn-lg fw-bold">Rent a Charger</a>
             <?php endif; ?>
