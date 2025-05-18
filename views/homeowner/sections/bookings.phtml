@@ -39,7 +39,7 @@ $bookings = Booking::getAllForHomeOwnerId($user->id);
                     <td><?= $booking->end_time->format('Y-m-d H:i') ?></td>
                     <td>
                         <?php
-                        switch ($booking->status->value) {
+                        switch ($booking->status) {
                             case 'approved':
                                 $statusClass = 'bg-success';
                                 break;
