@@ -284,6 +284,15 @@ $AllChargePoints = ChargePoint::getAll();
         checkboxField.classList.remove('is-invalid');
     }
 
+    // Validate homeowner email via AJAX
+    const emailField = this.querySelector('[name="homeowner_email"]');
+    const isEmailValid = await validateHomeownerEmail(emailField);
+    if (!isEmailValid) {
+        alert('Please enter a valid homeowner email.');
+        emailField.focus();
+        return;
+    }
+
     if (!isValid) {
         alert('Please fill in all required fields, attach an image, and check the availability box.');
         return;
@@ -326,48 +335,157 @@ $AllChargePoints = ChargePoint::getAll();
     }
 });
 
-document.querySelector('[name="homeowner_email"]').addEventListener('blur', async function () {
-    const emailField = this;
+// Validate homeowner email via AJAX
+async function validateHomeownerEmail(emailField) {
     const email = emailField.value.trim();
-
     if (!email) {
         emailField.classList.remove('is-valid', 'is-invalid');
-        return;
+        return false;
     }
-
     try {
         const formData = new FormData();
         formData.append('form_id', 'validateHomeownerEmail');
         formData.append('email', email);
 
-        const response = await fetch('<?=PREFIX?>/admin.php', {
+        const response = await fetch('<?= PREFIX ?>/admin.php', {
             method: 'POST',
             body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
         });
-
         const data = await response.json();
-
         if (data.success) {
             emailField.classList.remove('is-invalid');
             emailField.classList.add('is-valid');
-            emailField.nextElementSibling.textContent = ''; // Clear error message
+            emailField.nextElementSibling.textContent = '';
+            return true;
         } else {
             emailField.classList.remove('is-valid');
             emailField.classList.add('is-invalid');
-            emailField.nextElementSibling.textContent = data.message; // Show error message
+            emailField.nextElementSibling.textContent = data.message || 'This user does not exist or is not a homeowner.';
+            return false;
         }
     } catch (error) {
-        console.error('Error validating email:', error);
         emailField.classList.remove('is-valid');
         emailField.classList.add('is-invalid');
-        emailField.nextElementSibling.textContent = 'An error occurred while validating the email.';
+        emailField.nextElementSibling.textContent = 'Error validating email.';
+        return false;
     }
+}
+
+// Attach blur listeners to validate email live
+document.querySelectorAll('[name="homeowner_email"]').forEach(field => {
+    field.addEventListener('blur', function () {
+        validateHomeownerEmail(this);
+    });
 });
 
-    document.querySelectorAll('.delete-charge-point').forEach(button => {
+// AJAX handler for Add and Edit forms
+async function handleChargePointFormSubmit(form, modalId, isEdit = false) {
+    event.preventDefault();
+
+    // Validate required fields
+    const requiredFields = form.querySelectorAll('[required]');
+    let isValid = true;
+    requiredFields.forEach(field => {
+        if (!field.value.trim()) {
+            field.classList.add('is-invalid');
+            isValid = false;
+        } else {
+            field.classList.remove('is-invalid');
+        }
+    });
+
+    // Validate the image field (only for Add)
+    if (!isEdit) {
+        const imageField = form.querySelector('[name="image"]');
+        if (imageField && !imageField.files.length) {
+            imageField.classList.add('is-invalid');
+            isValid = false;
+        } else {
+            imageField.classList.remove('is-invalid');
+        }
+    }
+
+    // Validate the checkbox
+    const checkboxField = form.querySelector('[name="is_available"]');
+    if (checkboxField && !checkboxField.checked) {
+        checkboxField.classList.add('is-invalid');
+        isValid = false;
+    } else {
+        checkboxField.classList.remove('is-invalid');
+    }
+
+    // Validate homeowner email via AJAX
+    const emailField = form.querySelector('[name="homeowner_email"]');
+    const isEmailValid = await validateHomeownerEmail(emailField);
+    if (!isEmailValid) {
+        alert('Please enter a valid homeowner email.');
+        emailField.focus();
+        return;
+    }
+
+    if (!isValid) {
+        alert('Please fill in all required fields, attach an image, and check the availability box.');
+        return;
+    }
+
+    const formData = new FormData(form);
+
+    try {
+        const response = await fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        const text = await response.text();
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch {
+            alert('Unexpected server response.');
+            return;
+        }
+
+        if (data.success) {
+            alert(data.message);
+
+            // Update table row for edit, or reload for add
+            if (isEdit) {
+                const chargePointId = formData.get('charge_point_id');
+                const row = document.querySelector(`[data-row-id="row-${chargePointId}"]`);
+                if (row) {
+                    row.querySelector('td:nth-child(2)').textContent = formData.get('location');
+                    row.querySelector('td:nth-child(3)').textContent = formData.get('homeowner_email');
+                    row.querySelector('td:nth-child(4)').textContent = formData.get('price_per_kwh');
+                    row.querySelector('td:nth-child(5) span').textContent = formData.get('is_available') ? 'Available' : 'Not Available';
+                    row.querySelector('td:nth-child(5) span').className = formData.get('is_available') ? 'badge bg-success' : 'badge bg-secondary';
+                }
+            } else {
+                // For add, reload to show the new row
+                window.location.reload();
+            }
+
+            // Hide the modal and reset the form
+            const modal = bootstrap.Modal.getInstance(document.getElementById(modalId));
+            modal.hide();
+            form.reset();
+        } else {
+            alert(data.message || 'An error occurred.');
+        }
+    } catch (error) {
+        alert('An error occurred while submitting the form.');
+    }
+}
+
+// Attach AJAX submit handlers
+document.getElementById('addChargePointForm').addEventListener('submit', function (event) {
+    handleChargePointFormSubmit(this, 'addChargePointModal', false);
+});
+document.getElementById('editChargePointForm').addEventListener('submit', function (event) {
+    handleChargePointFormSubmit(this, 'editChargePointModal', true);
+});
+
+document.querySelectorAll('.delete-charge-point').forEach(button => {
     button.addEventListener('click', async function () {
         const chargePointId = this.getAttribute('data-charge-point-id'); // Get the charge point ID
         const rowId = this.getAttribute('data-row-id'); // Get the row ID

@@ -257,7 +257,7 @@ case 'addChargePointForm':
                 $imageContent
             );
     
-            echo json_encode(['success' => true, 'message' => 'Charge point updated successfully.']);
+           // echo json_encode(['success' => true, 'message' => 'Charge point updated successfully.']);
         } catch (Exception $e) {
             error_log('Error updating charge point: ' . $e->getMessage());
             echo json_encode(['success' => false, 'message' => 'Failed to update charge point: ' . $e->getMessage()]);
@@ -410,7 +410,7 @@ case 'validateHomeownerEmail':
             $imageContent
         );
 
-        echo json_encode(['success' => true, 'message' => 'Charge point updated successfully.']);
+        //echo json_encode(['success' => true, 'message' => 'Charge point updated successfully.']);
     } catch (Exception $e) {
         echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
     }
