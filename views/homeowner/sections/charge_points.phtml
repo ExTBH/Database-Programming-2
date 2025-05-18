@@ -14,10 +14,12 @@ $AllChargePoints = ChargePoint::getByHomeownerId($user->id);
 
 ?>
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="fs-4 fw-bold mb-0">Manage Charge Points</h2>
-    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addChargePointModal">
-        <i class="fa-solid fa-plus me-2"></i>Add Charge Point
-    </button>
+    <h2 class="fs-4 fw-bold mb-0">Manage Charge Point</h2>
+    <?php if (empty($AllChargePoints)): ?>
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addChargePointModal">
+            <i class="fa-solid fa-plus me-2"></i>Add Charge Point
+        </button>
+    <?php endif; ?>
 </div>
 
 <!-- Search & Filter -->
@@ -402,6 +404,9 @@ $AllChargePoints = ChargePoint::getByHomeownerId($user->id);
                         // Remove the row from the table using the row ID
                         const row = document.querySelector(`[data-row-id="${rowId}"]`).closest('tr');
                         if (row) row.remove();
+
+                        // Optionally, reload the page or update the table dynamically
+                        window.location.reload();
                     } else {
                         alert(data.message || 'Failed to delete charge point.');
                     }

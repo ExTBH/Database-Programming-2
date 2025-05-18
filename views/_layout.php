@@ -24,7 +24,7 @@ $user = User::fromSession();
 <body class="d-flex flex-column min-vh-100 bg-light">
     <header class="d-flex justify-content-between align-items-center border-bottom border-light px-4 py-3 bg-white">
         <a href="<?= PREFIX ?>/index.php" class="d-flex align-items-center gap-3 text-dark text-decoration-none">
-            <i class="fa-solid fa-truck-moving fs-3"></i>
+            <i class="fa-solid fa-car-side fs-3"></i>
             <span class="fw-bold h4 mb-0 ms-2" style="line-height:1;">Bahrent</span>
         </a>
         <div class="d-flex justify-content-end align-items-center gap-2">
