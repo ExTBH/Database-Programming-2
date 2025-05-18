@@ -156,7 +156,7 @@ class User
                         "INSERT INTO users (first_name, last_name, email, role, password, suspended) 
                          VALUES (?, ?, ?, ?, ?, ?)"
                     );
-                    return $stmt->execute([$firstName, $lastName, $email, $role->getValue(), $hashedPassword, (int)$suspended]);
+                    return $stmt->execute([$firstName, $lastName, $email, $role, $hashedPassword, (int)$suspended]);
 
                 case 'update':
                     if (!$userId) {
@@ -180,7 +180,7 @@ class User
                     }
                     if ($role) {
                         $updates[] = "role = ?";
-                        $params[] = $role->getValue();
+                        $params[] = $role;
                     }
                     if ($password) {
                         $updates[] = "password = ?";
