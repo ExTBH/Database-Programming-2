@@ -2,25 +2,49 @@
 
 require_once __DIR__ . '/BaseController.php';
 require_once __DIR__ . '/../models/User.php';
+require_once __DIR__ . '/../models/Message.php';
 
 class HomeOwnerController extends BaseController
 {
-    private array $allowedSections = ['charge-points', 'users'];
     private string $activeSection;
 
-    public function __construct() {}
+    public function __construct()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_id'])) {
+            switch ($_POST['form_id']) {
+                case 'markMessageAsRead':
+                    $this->handleMarkMessageAsRead();
+                    exit;
+            }
+        }
+    }
+
+    private function handleMarkMessageAsRead(): void
+    {
+        header('Content-Type: application/json');
+
+        if (!isset($_POST['message_id'])) {
+            echo json_encode(['success' => false, 'message' => 'Message ID is required']);
+            return;
+        }
+
+        try {
+            Message::markAsRead((int)$_POST['message_id']);
+            echo json_encode(['success' => true]);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => 'Failed to mark message as read']);
+        }
+    }
 
     public function index(): void
     {
         $this->activeSection = $_GET['section'] ?? 'charge-points';
 
-        if (!in_array($this->activeSection, $this->allowedSections)) {
-            $this->activeSection = 'charge-points';
-        }
 
         $sectionContent = match ($this->activeSection) {
             'charge-points' => $this->manageChargePoints(),
             'users' => $this->manageUserAccounts(),
+            'messages' => $this->manageMessages(),
             default => $this->manageChargePoints()
         };
 
@@ -33,7 +57,6 @@ class HomeOwnerController extends BaseController
 
     private function manageChargePoints(): string
     {
-        $chargePoints = []; // TODO: Get from database
 
         ob_start();
         require __DIR__ . '/../views/homeowner/sections/charge_points.phtml';
@@ -42,9 +65,15 @@ class HomeOwnerController extends BaseController
 
     private function manageUserAccounts(): string
     {
-        $user = []; // TODO: Get from database
         ob_start();
         require __DIR__ . '/../views/homeowner/sections/bookings.phtml';
+        return ob_get_clean();
+    }
+
+    private function manageMessages(): string
+    {
+        ob_start();
+        require __DIR__ . '/../views/homeowner/sections/messages.phtml';
         return ob_get_clean();
     }
 }

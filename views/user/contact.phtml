@@ -1,0 +1,133 @@
+<?php
+
+require_once __DIR__ . '/../../models/User.php';
+
+$user = User::fromSession();
+$homeowner = User::getById($_GET['homeowner'] ?? null);
+
+if (!$user) {
+    header('Location: ' . PREFIX . '/login.php');
+    exit;
+}
+
+if (!$homeowner) {
+    header('Location: ' . PREFIX . '/browse.php');
+    exit;
+}
+
+?>
+
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h2 class="card-title mb-0 fs-4">Contact Home Owner</h2>
+                </div>
+                <div class="card-body">
+                    <?php if (isset($_GET['error'])): ?>
+                        <div class="alert alert-danger mb-3">
+                            <i class="fa-solid fa-circle-exclamation me-2"></i>
+                            <?php echo htmlspecialchars($_GET['error']); ?>
+                        </div>
+                    <?php endif; ?>
+
+                    <form method="post">
+                        <input type="text" name="homeowner_id" value="<?php echo htmlspecialchars($homeowner->id ?? ''); ?>" hidden>
+                        <!-- Homeowner Name (disabled) -->
+                        <div class="mb-3">
+                            <label class="form-label text-success">Home Owner Name</label>
+                            <input type="text" class="form-control bg-light" value="<?php echo htmlspecialchars($homeowner->firstName . ' ' . $homeowner->lastName ?? ''); ?>" disabled>
+                        </div>
+
+                        <!-- User Email (disabled) -->
+                        <div class="mb-3">
+                            <label class="form-label text-success">Your Email</label>
+                            <input type="email" class="form-control bg-light" value="<?php echo htmlspecialchars($user->email ?? ''); ?>" disabled>
+                        </div>
+
+                        <!-- Subject -->
+                        <div class="mb-3">
+                            <label class="form-label text-success">Subject <span class="text-danger">*</span></label>
+                            <input type="text"
+                                class="form-control"
+                                name="subject"
+                                required
+                                placeholder="Enter message subject">
+                        </div>
+
+                        <!-- Message -->
+                        <div class="mb-3">
+                            <label class="form-label text-success">Message <span class="text-danger">*</span></label>
+                            <textarea class="form-control"
+                                name="message"
+                                rows="5"
+                                required
+                                placeholder="Type your message here"></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-success d-flex align-items-center gap-2">
+                            <i class="fa-solid fa-paper-plane"></i>
+                            Send Message
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.querySelector('form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        // Get form data
+        const formData = new FormData(this);
+
+        try {
+            // Submit form
+            const response = await fetch('<?= PREFIX ?>/contact.php', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+
+            // Remove any existing alerts
+            const existingAlerts = document.querySelectorAll('.alert');
+            existingAlerts.forEach(alert => alert.remove());
+
+            // Create new alert
+            const alert = document.createElement('div');
+            alert.className = `alert ${result.error ? 'alert-danger' : 'alert-success'} mb-3`;
+
+            // Add icon based on type
+            const icon = document.createElement('i');
+            icon.className = `fa-solid ${result.error ? 'fa-circle-exclamation' : 'fa-circle-check'} me-2`;
+            alert.appendChild(icon);
+
+            // Add message
+            const message = document.createTextNode(result.error || result.success);
+            alert.appendChild(message);
+
+            // Insert alert at the top of the form
+            const form = document.querySelector('form');
+            form.insertAdjacentElement('beforebegin', alert);
+
+            // If success, clear form
+            if (!result.error) {
+                form.reset();
+            }
+
+        } catch (error) {
+            console.error('Error:', error);
+            // Handle network errors
+            const alert = document.createElement('div');
+            alert.className = 'alert alert-danger mb-3';
+            alert.innerHTML = '<i class="fa-solid fa-circle-exclamation me-2"></i>An error occurred. Please try again.';
+            const form = document.querySelector('form');
+            form.insertAdjacentElement('beforebegin', alert);
+        }
+    });
+</script>

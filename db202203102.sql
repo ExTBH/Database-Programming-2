@@ -102,14 +102,9 @@ INSERT INTO `HomeOwnerRequests` (`id`, `email`, `first_name`, `last_name`, `pass
 (1, 'future.owner1@example.com', 'Ali', 'Hassan', '$2y$10$FuturePass123', '2025-05-05 07:50:50', 'pending', NULL),
 (2, 'future.owner2@example.com', 'Fatima', 'Yousef', '$2y$10$FuturePass456', '2025-05-05 07:50:50', 'pending', NULL);
 
--- --------------------------------------------------------
-
---
--- Table structure for table `messages`
---
-
 CREATE TABLE `messages` (
   `message_id` int(11) NOT NULL,
+  `booking_id` int(11) NOT NULL,
   `sender_id` int(11) NOT NULL,
   `recipient_id` int(11) NOT NULL,
   `message` text NOT NULL,
@@ -224,27 +219,10 @@ ALTER TABLE `reviews`
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
-  ADD PRIMARY KEY (`user_id`);
+  ADD PRIMARY KEY (`user_id`),
+  ADD UNIQUE KEY `email` (`email`);
 
---
--- AUTO_INCREMENT for dumped tables
---
 
---
--- AUTO_INCREMENT for table `bookings`
---
-ALTER TABLE `bookings`
-  MODIFY `booking_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
--- AUTO_INCREMENT for table `charge_points`
---
-ALTER TABLE `charge_points`
-  MODIFY `charge_point_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
--- AUTO_INCREMENT for table `HomeOwnerRequests`
---
 ALTER TABLE `HomeOwnerRequests`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
