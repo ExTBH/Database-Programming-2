@@ -1,11 +1,18 @@
 <?php
 require_once __DIR__ . '/../../../models/HomeOwnerRequest.php';
-$requests = HomeOwnerRequest::getAll();
+// Pagination logic
+$page = isset($_GET['page']) && is_numeric($_GET['page']) && $_GET['page'] > 0 ? (int)$_GET['page'] : 1;
+$limit = 10;
+$offset = ($page - 1) * $limit;
+$totalRequests = HomeOwnerRequest::countAll();
+$totalPages = (int)ceil($totalRequests / $limit);
+$requests = HomeOwnerRequest::getAll($offset, $limit);
 ?>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2 class="fs-4 fw-bold mb-0">Homeowner Requests</h2>
 </div>
+
 
 <!-- Requests Table -->
 <div class="table-responsive">
@@ -73,6 +80,22 @@ $requests = HomeOwnerRequest::getAll();
         </tbody>
     </table>
 </div>
+
+<nav aria-label="Homeowner Requests Pagination">
+    <ul class="pagination justify-content-center mt-3">
+        <li class="page-item<?= $page <= 1 ? ' disabled' : '' ?>">
+            <a class="page-link" href="?section=homeowner-requests&page=<?= $page - 1 ?>" tabindex="-1">Previous</a>
+        </li>
+        <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+            <li class="page-item<?= $i == $page ? ' active' : '' ?>">
+                <a class="page-link" href="?section=homeowner-requests&page=<?= $i ?>"><?= $i ?></a>
+            </li>
+        <?php endfor; ?>
+        <li class="page-item<?= $page >= $totalPages ? ' disabled' : '' ?>">
+            <a class="page-link" href="?section=homeowner-requests&page=<?= $page + 1 ?>">Next</a>
+        </li>
+    </ul>
+</nav>
 
 <!-- Approve Modal -->
 <div class="modal fade" id="approveModal" tabindex="-1">

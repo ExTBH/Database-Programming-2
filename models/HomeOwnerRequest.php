@@ -80,12 +80,16 @@ class HomeOwnerRequest
     }
 
     /**
+     * @param int $offset
+     * @param int $limit
      * @return HomeOwnerRequest[]
      */
-    public static function getAll()
+    public static function getAll($offset = 0, $limit = 10)
     {
         $conn = Database::getInstance()->getConnection();
-        $stmt = $conn->prepare("SELECT * FROM HomeOwnerRequests");
+        $stmt = $conn->prepare("SELECT * FROM HomeOwnerRequests ORDER BY id DESC LIMIT :limit OFFSET :offset");
+        $stmt->bindValue(':limit', (int)$limit, \PDO::PARAM_INT);
+        $stmt->bindValue(':offset', (int)$offset, \PDO::PARAM_INT);
         $stmt->execute();
 
         $requests = [];
@@ -94,6 +98,19 @@ class HomeOwnerRequest
         }
 
         return $requests;
+    }
+
+    /**
+     * @return int
+     */
+    public static function countAll()
+    {
+        $conn = Database::getInstance()->getConnection();
+        $stmt = $conn->prepare("SELECT COUNT(*) AS request_count FROM HomeOwnerRequests");
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $row ? (int)$row['request_count'] : 0;
     }
 
     /**
