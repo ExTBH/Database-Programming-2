@@ -6,7 +6,7 @@ require_once __DIR__ . '/../models/Message.php';
 
 class HomeOwnerController extends BaseController
 {
-    private string $activeSection;
+    private $activeSection;
 
     public function __construct()
     {
