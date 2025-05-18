@@ -166,8 +166,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 // Read the image file content
                 $imageContent = null;
+                $imageMime = null;
+
                 if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-                    $imageContent = file_get_contents($_FILES['image']['tmp_name']); // Read the raw image content
+                    $imageContent = file_get_contents($_FILES['image']['tmp_name']);
+                    $imageMime = mime_content_type($_FILES['image']['tmp_name']);
+                }
+                if ($imageContent && !in_array($imageMime, ['image/jpeg', 'image/png'])) {
+                    error_log('Invalid image type: ' . $imageMime);
+                    echo json_encode(['success' => false, 'message' => 'Invalid image type.']);
+                    exit;
                 }
 
                 if (!$location || !$postcode || !$latitude || !$longitude || !$pricePerKwh || !$homeownerEmail) {
@@ -197,9 +205,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $pricePerKwh, // Pass the float value
                         $description,
                         $isAvailable,
-                        $imageContent // Pass the raw image content directly
+                        $imageContent,
+                        $imageMime
                     );
-                  //  echo json_encode(['success' => true, 'message' => 'Charge point added successfully.']);
+                    echo json_encode(['success' => true, 'message' => 'Charge point added successfully.']);
                 } catch (Exception $e) {
                     error_log('Error adding charge point: ' . $e->getMessage()); // Log exceptions
                     echo json_encode(['success' => false, 'message' => 'Failed to add charge point: ' . $e->getMessage()]);
@@ -266,7 +275,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     );
 
-                   // echo json_encode(['success' => true, 'message' => 'Charge point updated successfully.']);
+                    // echo json_encode(['success' => true, 'message' => 'Charge point updated successfully.']);
                 } catch (Exception $e) {
                     error_log('Error updating charge point: ' . $e->getMessage());
                     echo json_encode(['success' => false, 'message' => 'Failed to update charge point: ' . $e->getMessage()]);

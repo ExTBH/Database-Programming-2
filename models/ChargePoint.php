@@ -268,17 +268,25 @@ class ChargePoint
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW(), ?)
                     ");
 
-                    return $stmt->execute([
-                        $homeownerId,
-                        $address,
-                        $postcode,
-                        $latitude,
-                        $longitude,
-                        (float)$pricePerKwh,
-                        $description,
-                        (int)$isAvailable,
-                        $base64Image
-                    ]);
+                    try {
+                        $result = $stmt->execute([
+                            $homeownerId,
+                            $address,
+                            $postcode,
+                            $latitude,
+                            $longitude,
+                            (float)$pricePerKwh,
+                            $description,
+                            (int)$isAvailable,
+                            $base64Image
+                        ]);
+                        if (!$result) {
+                            throw new PDOException("Failed to execute statement");
+                        }
+                        return true;
+                    } catch (PDOException $e) {
+                        throw new PDOException("Error adding charge point: " . $e->getMessage());
+                    }
 
                 case 'update':
                     if (!$chargePointId) {

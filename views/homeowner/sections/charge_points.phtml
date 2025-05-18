@@ -203,8 +203,8 @@ $AllChargePoints = ChargePoint::getByHomeownerId($user->id);
                         <input type="number" name="price_per_kwh" step="0.001" class="form-control" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Homeowner Email</label>
-                        <input type="email" name="homeowner_email" class="form-control" required>
+                        <!-- <label class="form-label">Homeowner Email</label> -->
+                        <input type="email" name="homeowner_email" class="form-control" hidden required value="<?= htmlspecialchars($user->email) ?>">
                         <div class="invalid-feedback">This user does not exist or is not a homeowner.</div>
                     </div>
                     <div class="mb-3">
