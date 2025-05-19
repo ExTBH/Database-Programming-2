@@ -189,8 +189,8 @@ class Booking
     public static function add(
         $charge_point_id,
         $user_id,
-        DateTime $start_time,
-        DateTime $end_time,
+        $start_time,
+        $end_time,
         $status
     ) {
         $conn = Database::getInstance()->getConnection();
