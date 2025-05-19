@@ -191,7 +191,7 @@ class Booking
         $user_id,
         DateTime $start_time,
         DateTime $end_time,
-        string $status
+        $status
     ) {
         $conn = Database::getInstance()->getConnection();
         $stmt = $conn->prepare(

@@ -56,7 +56,6 @@ class RentController extends BaseController
                 $startDateTime,
                 $endDateTime,
                 'pending',
-                $totalPrice,
             );
         } catch (Exception $e) {
             http_response_code(500);

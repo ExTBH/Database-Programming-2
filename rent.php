@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '/controllers/RentController.php';
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/controllers/RentController.php';
 
 session_start();
 
