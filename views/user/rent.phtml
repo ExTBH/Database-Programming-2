@@ -295,7 +295,7 @@ $user = User::fromSession();
                         errorAlert.querySelector('.error-message').textContent = data.error;
                         submitBtn.disabled = false;
                     } else {
-                        window.location.href = '<?= PREFIX ?>/history.php';
+                        window.location.href = '<?= PREFIX ?>/booking.php';
                     }
                 })
                 .catch(error => {
